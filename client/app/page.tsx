@@ -117,7 +117,7 @@ const HomepageContent = () => {
                   ))}
 
                   {Array(2).fill(0).map((_, index) => (
-                    <div key={index} className="bg-lime-200 w-5 h-5 md:h-3 md:w-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-1 rounded-full">
+                    <div key={index} className="bg-lime-200 w-5 h-5 md:h-3 md:w-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
 
                     </div>
                   ))}
@@ -126,13 +126,13 @@ const HomepageContent = () => {
                 <div className="grid grid-cols-7 gap-3 mb-3">
 
                   {Array(3).fill(0).map((_, index) => (
-                    <div key={index} className="bg-lime-500 w-5 h-5 md:w-3 md:h-3  lg:w-8 lg:h-8 2xl:w-12 2xl:h-1 rounded-full">
+                    <div key={index} className="bg-lime-500 w-5 h-5 md:w-3 md:h-3  lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
 
                     </div>
                   ))}
 
                   {Array(4).fill(0).map((_, index) => (
-                    <div key={index} className="bg-lime-200 w-5 h-5  md:w-3 md:h-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-1 rounded-full">
+                    <div key={index} className="bg-lime-200 w-5 h-5  md:w-3 md:h-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
 
                     </div>
                   ))}
@@ -141,13 +141,13 @@ const HomepageContent = () => {
                 <div className="grid grid-cols-7 gap-3 mb-7 md:mb-3">
 
                   {Array(2).fill(0).map((_, index) => (
-                    <div key={index} className="bg-lime-500 w-5 h-5 md:w-3 md:h-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-1 rounded-full">
+                    <div key={index} className="bg-lime-500 w-5 h-5 md:w-3 md:h-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
 
                     </div>
                   ))}
 
                   {Array(5).fill(0).map((_, index) => (
-                    <div key={index} className="bg-lime-200 w-5 h-5 md:w-3 md:h-3  lg:w-8 lg:h-8 2xl:w-12 2xl:h-1 rounded-full">
+                    <div key={index} className="bg-lime-200 w-5 h-5 md:w-3 md:h-3  lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
 
                     </div>
                   ))}
