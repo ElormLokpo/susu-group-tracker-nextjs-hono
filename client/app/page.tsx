@@ -22,53 +22,6 @@ export default function Home() {
   );
 }
 
-const Marquee = () => {
-  return (
-    <div className="overflow-hidden whitespace-nowrap flex items-center justify-center py-4">
-      <div className="inline-flex animate-marquee">
-
-        <div className="flex items-center gap-12 px-8">
-          <span className="text-lg flex gap-2 items-center font-medium text-gray-700">
-            <Image src="/mtn.svg" width={100} height={100} alt="Partner" className="h-8 w-auto opacity-70" />
-            MTN Ghana
-          </span>
-
-          <span className="text-lg flex gap-2 items-center font-medium text-gray-700">
-            <Image src="/telecel.svg" width={100} height={100} alt="Partner" className="h-8 w-auto opacity-70" />
-            Telecel Ghana
-          </span>
-
-          <span className="text-lg flex gap-2 items-center font-medium text-gray-700">
-            <Image src="/paystack.svg" width={70} height={100} alt="Partner" className="h-8 w-auto opacity-70" />
-
-          </span>
-
-
-
-
-        </div>
-
-
-        <div className="flex items-center gap-12 px-8">
-          <span className="text-lg flex gap-2 items-center font-medium text-gray-700">
-            <Image src="/mtn.svg" width={100} height={100} alt="Partner" className="h-8 w-auto opacity-70" />
-            MTN Ghana
-          </span>
-
-          <span className="text-lg flex gap-2 items-center font-medium text-gray-700">
-            <Image src="/telecel.svg" width={100} height={100} alt="Partner" className="h-8 w-auto opacity-70" />
-            Telecel Ghana
-          </span>
-
-          <span className="text-lg flex gap-2 items-center font-medium text-gray-700">
-            <Image src="/paystack.svg" width={70} height={100} alt="Partner" className="h-8 w-auto opacity-70" />
-
-          </span>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 
 const HomepageContent = () => {
@@ -270,13 +223,7 @@ const HomepageContent = () => {
 
       </div>
 
-      {/* <div className="mb-50 flex flex-col gap-5 items-center justify-center">
-        <div className="text-[30px] flex gap-4 items-center">
-          Payment companies we work with
-        </div>
-
-        <Marquee />
-      </div> */}
+    
 
     </div>
   )
@@ -293,7 +240,7 @@ function Footer() {
           <span className="text-lg font-bold tracking-tight text-neutral-900">
             SuSu
           </span>
-          <span className="text-xs text-neutral-400">© {new Date().getFullYear()}</span>
+          <span className="text-xs text-neutral-400">© 2026</span>
         </div>
 
 
