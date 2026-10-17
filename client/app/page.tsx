@@ -1,13 +1,18 @@
-
+"use client"
 import { GoArrowUpRight } from "react-icons/go";
 import { TopNav } from "./components/topNav";
-import Image from "next/image";
+import { CLIENT_ROUTES } from "./constants";
+import Link from "next/link";
+
+
 
 export default function Home() {
+  
+
   return (
     <div className="">
       <div className="hidden md:block fixed top-0 w-full h-full z-10 ">
-        <TopNav />
+        <TopNav  />
       </div>
 
       <div className="py-3 md:py-5 lg:py-10 text-stone-800">
@@ -47,7 +52,7 @@ const HomepageContent = () => {
         </div>
 
         <div className="flex items-center justify-center mb-10 md:mb-20 lg:mb-20 2xl:mb-50">
-          <button className=" md:text-xs lg:text-normal flex items-center animate-bounce bg-stone-900 text-stone-100 gap-3 pr-2 pl-5 shadow-xl shadow-lime-500 py-2 rounded-full"> Get started with SuSu<span className="bg-white text-stone-900 p-2 text-xl rounded-full"> <GoArrowUpRight /> </span></button>
+          <Link href={CLIENT_ROUTES.auth} className=" md:text-xs lg:text-normal flex items-center animate-bounce bg-stone-900 text-stone-100 gap-3 pr-2 pl-5 shadow-xl shadow-lime-500 py-2 rounded-full"> Get started with SuSu<span className="bg-white text-stone-900 p-2 text-xl rounded-full"> <GoArrowUpRight /> </span></Link>
         </div>
 
         
