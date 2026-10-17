@@ -15,7 +15,7 @@ export const VerifyEmailPage = () => {
     <div className="flex items-center justify-center h-screen py-10 px-3">
       <div className="w-130">
 
-        <div className="px-16 mb-4">
+        <div className="px-5 md:px-16 mb-4">
           <VerifyEmailForm />
         </div>
       </div>

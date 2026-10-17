@@ -48,11 +48,11 @@ export const AuthForm = () => {
         <div className="  h-full py-10 flex justify-center items-center">
             <div className="w-130">
 
-                <div className="px-16 mb-4">
+                <div className="px-5 md:px-16 mb-4">
                     {currentForm == "signUp" ? <SignUpForm /> : <SignInForm />}
                 </div>
 
-                <div className="px-16 mb-4">
+                <div className="px-5 md:px-16 mb-4">
                     <GoogleLogin
                         onSuccess={handleOAuth}
                         onError={() => toast.error("Google login failed. Tyy again later")}
