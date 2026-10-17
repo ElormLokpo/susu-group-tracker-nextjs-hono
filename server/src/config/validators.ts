@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { toPesewas } from "../utils/money";
 
 export const registerSchema = z.object({
   email: z.email("Invalid email address"),
@@ -33,33 +34,49 @@ export const resetPasswordSchema = z.object({
   email: z.email("Invalid email address"),
 });
 
-export const createPostSchema = z.object({
-  title: z.string().min(1).max(255),
 
-  summary: z.string().min(1),
-
-  body: z.string().min(1),
-
-  category: z.string().min(1).max(100),
-
-  coverPhoto: z.string().url().optional().nullable(),
-
-  published: z.boolean().default(false),
+export const positiveMoney = z.union([z.string(), z.number()]).transform((value, ctx) => {
+  try {
+    const pesewas = toPesewas(value);
+    if (pesewas <= 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Amount must be greater than zero" });
+      return z.NEVER;
+    }
+    return pesewas;
+  } catch (e) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: (e as Error).message });
+    return z.NEVER;
+  }
 });
 
-export const createCommentSchema = z.object({
-  postId: z.string().min(1),
-  body: z.string().min(1).max(5000),
+export const uuidSchema = z.string().uuid();
+
+
+export const createGroupSchema = z.object({
+  name: z.string().trim().min(2).max(100),
+  weeklyAmount: positiveMoney,
 });
 
-export const updateCommentSchema = z.object({
-  body: z.string().min(1).max(5000),
+export const addMemberSchema = z.object({
+  userId: uuidSchema,
 });
 
-export const updatePostSchema = createPostSchema.partial();
+
+export const recordContributionSchema = z.object({
+  userId: uuidSchema,
+  amount: positiveMoney,
+  
+  week: z.number().int().positive().optional(),
+});
+
+export const listTransactionsQuery = z.object({
+  type: z.enum(["contribution", "payout"]).optional(),
+  week: z.coerce.number().int().positive().optional(),
+  userId: uuidSchema.optional(),
+});
+
+
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 
-export type PostInput = z.infer<typeof createPostSchema>;
-export type UpdatePostInput = z.infer<typeof updatePostSchema>;

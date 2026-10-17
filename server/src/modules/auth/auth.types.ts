@@ -1,6 +1,6 @@
 import { env } from "../../config";
 
-export type Role = "user" | "admin" | undefined;
+export type Role = "member" | "admin" | undefined;
 
 export interface JWTPayload {
   sub: string;

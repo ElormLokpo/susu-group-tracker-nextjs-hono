@@ -2,6 +2,8 @@ import { createMiddleware } from "hono/factory";
 import { getCookie } from "hono/cookie";
 import { type AppVariables, Role } from "./auth.types";
 import { verifyToken } from "./auth.jwt";
+import type { AppEnv } from "../shared";
+import { ForbiddenError, UnauthorizedError } from "../../utils/errors";
 
 export const authMiddleware = createMiddleware<{ Variables: AppVariables }>(
   async (c, next) => {
@@ -27,18 +29,15 @@ export const authMiddleware = createMiddleware<{ Variables: AppVariables }>(
   },
 );
 
-export function requireRole(...roles: Role[]) {
-  return createMiddleware<{ Variables: AppVariables }>(async (c, next) => {
+
+
+export const requireRole = (...allowed: Role[]) =>
+  createMiddleware<AppEnv>(async (c, next) => {
     const user = c.get("user");
-
-    if (!user) {
-      return c.json({ error: "Unauthorized" }, 401);
+    if (!user) throw new UnauthorizedError();
+    if (!allowed.includes(user.role)) {
+      throw new ForbiddenError(`Requires role: ${allowed.join(" or ")}`);
     }
-
-    if (!roles.includes(user.role)) {
-      return c.json({ error: "Forbidden" }, 403);
-    }
-
     await next();
   });
-}
+
