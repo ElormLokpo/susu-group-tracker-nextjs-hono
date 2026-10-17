@@ -6,6 +6,9 @@ export const CLIENT_ROUTES = {
     resetPassword: `/auth/reset-password`,
     home: `/`,
     dashboard: `/dashboard`,
+    dashboardUsers: `/dashboard/users`,
+    dashboardTransactions: `/dashboard/transactions`,
+    dashboardGroups: `/dashboard/groups`,
 }
 
 export const API_ROUTES = {
