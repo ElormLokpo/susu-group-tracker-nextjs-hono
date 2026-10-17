@@ -1,12 +1,37 @@
 {
   "name": "server",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/server.ts",
+    "start": "bun run src/server.ts",
+    "db:migrate": "bunx drizzle-kit push",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:seed": "bun run src/db/seed.ts"
   },
   "dependencies": {
-    "hono": "^4.13.13"
+    "@better-auth/drizzle-adapter": "^1.7.5",
+    "@hono/node-server": "^2.1.1",
+    "@neondatabase/serverless": "^1.1.0",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^18.0.3",
+    "drizzle-orm": "^0.45.3",
+    "eslint": "^10.11.0",
+    "hono": "^4.13.13",
+    "jose": "^6.2.12",
+    "postgres": "^3.4.9",
+    "resend": "^6.32.1",
+    "server": ".",
+    "zod": "^4.6.6"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@eslint/js": "^10.0.1",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/bun": "^1.4.3",
+    "drizzle-kit": "^0.31.11",
+    "prettier": "^3.9.9",
+    "tsx": "^4.23.15",
+    "typescript-eslint": "^8.71.0"
   }
 }

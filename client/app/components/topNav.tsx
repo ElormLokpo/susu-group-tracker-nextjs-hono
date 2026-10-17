@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CLIENT_ROUTES } from "../constants";
 
 export const TopNav = () => {
     return (
@@ -9,8 +10,8 @@ export const TopNav = () => {
                 <div className="flex gap-3 text-xs items-center">
                     <Link className="hover:underline" href="/"> How it works</Link>
 
-                    <Link className="hover:underline" href="/"> Login</Link>
-                    <Link href="/" className="bg-white text-stone-900 rounded-full p-2 hover:bg-stone-100 text-xs"> Get Started</Link>
+                    <Link className="hover:underline" href={CLIENT_ROUTES.auth}> Login</Link>
+                    <Link href={CLIENT_ROUTES.auth} className="bg-white text-stone-900 rounded-full p-2 hover:bg-stone-100 text-xs"> Get Started</Link>
                 </div>
             </div>
         </div>
