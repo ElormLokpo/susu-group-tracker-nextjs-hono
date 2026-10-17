@@ -3,17 +3,14 @@ import { Suspense } from "react";
 import { DashTopNav } from "./components/dashTopNav";
 import DatePickerDashboard from "./components/datePicker";
 import { getPageHeader } from "./helpers";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname} from "next/navigation";
 
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const searchParams = useSearchParams();
 
-    const fullPath = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
-    const urlSegments = fullPath.split(/[\/?]+/).filter(Boolean);
-
-    const currentPage = urlSegments[urlSegments.length - 1] || "dashboard";
+    const urlSegments = pathname.split("/").filter(Boolean);
+    const currentPage = urlSegments[1] || urlSegments[0] || "dashboard";
 
     const currentUserRole: string = "admin";
 
