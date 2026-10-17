@@ -12,7 +12,7 @@ describe("toPesewas", () => {
 
   test("rejects bad input", () => {
     for (const bad of ["-1", "abc", "1.234", "", "1e3", "1,000", 0.1 + 0.2, -5]) {
-      expect(() => toPesewas(bad as any)).toThrow();
+      expect(() => toPesewas(bad)).toThrow();
     }
   });
 

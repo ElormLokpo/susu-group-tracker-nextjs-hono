@@ -3,7 +3,6 @@ import {
   pgTable,
   uuid,
   index,
-  varchar,
   text,
   timestamp,
   pgEnum,

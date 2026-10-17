@@ -1,6 +1,6 @@
 import { and, asc, eq, sql } from "drizzle-orm";
 import { db } from "../../db";
-import { groupMembers, groups, Member, transactions, users } from "../../db/schema";
+import { groupMembers, groups, transactions, users } from "../../db/schema";
 import type { AuthUser } from "../auth/auth.types";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../utils/errors";
 import { formatGHS } from "../../utils/money";
