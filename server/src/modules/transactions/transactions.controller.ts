@@ -34,3 +34,8 @@ type C = Context<AppEnv>;
         const filters = parseQuery(c, listTransactionsQuery);
         return c.json({ data: await transactionsService.list(groupId, filters) });
     }
+
+    export const all = async (c: C) => {
+        
+        return c.json({ data: await transactionsService.all() });
+    }

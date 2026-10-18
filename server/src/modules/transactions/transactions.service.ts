@@ -1,9 +1,10 @@
 import { and, asc, eq } from "drizzle-orm";
 import { db } from "../../db";
-import { groups, transactions } from "../../db/schema";
+import { groups, transactions, users } from "../../db/schema";
 import { ConflictError, NotFoundError, UnprocessableError } from "../../utils/errors";
 import { formatGHS } from "../../utils/money";
-import { getWeekBalances, listMembers, lockGroup, serializeTransaction } from "../shared";
+import { getWeekBalances, listMembers, lockGroup, serializeAllTransactions, serializeTransaction } from "../shared";
+import { alias } from "drizzle-orm/pg-core";
 
 
 
@@ -146,4 +147,36 @@ export const list = async (groupId: string, filters: { type?: "contribution" | "
         .where(and(...conditions))
         .orderBy(asc(transactions.createdAt));
     return rows.map(serializeTransaction);
+}
+
+export const all = async () => {
+    const recorder = alias(users, "recorder_user");
+
+    const rawTransactions = await db
+        .select({
+           
+            id: transactions.id,
+            groupId: transactions.groupId,
+            userId: transactions.userId,
+            recordedBy: transactions.recordedBy,
+
+           
+            type: transactions.type,
+            week: transactions.week,
+            amount: transactions.amount,
+            createdAt: transactions.createdAt,
+
+            
+            userName: users.name,
+            groupName: groups.name,
+            recorderName: recorder.name,
+        })
+        .from(transactions)
+        .leftJoin(users, eq(transactions.userId, users.id))
+        .leftJoin(groups, eq(transactions.groupId, groups.id))
+        .leftJoin(recorder, eq(transactions.recordedBy, recorder.id))
+        .orderBy(asc(transactions.createdAt));
+
+        return rawTransactions.map(serializeAllTransactions);
+    
 }

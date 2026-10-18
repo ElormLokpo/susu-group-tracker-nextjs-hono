@@ -90,3 +90,37 @@ export function serializeTransaction(t: Transaction) {
     createdAt: t.createdAt,
   };
 }
+
+
+type rawTransactions = {
+  id: string;
+  groupId: string;
+  userId: string;
+  recordedBy: string;
+  type: "contribution" | "payout";
+  week: number;
+  amount: number;
+  createdAt: Date;
+  userName: string | null;
+  groupName: string | null;
+  recorderName: string | null;
+}
+
+
+export function serializeAllTransactions(t: rawTransactions) {
+  return {
+    id: t.id,
+    groupId: t.groupId,
+    userId: t.userId,
+    type: t.type,
+    week: t.week,
+    amount: formatGHS(t.amount),
+    currency: "GHS",
+    recordedBy: t.recordedBy,
+
+    userName: t.userName ?? "Unknown User",
+    groupName: t.groupName ?? "Unknown Group",
+    recorderName: t.recorderName ?? "System",
+  };
+}
+

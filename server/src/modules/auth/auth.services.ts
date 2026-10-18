@@ -40,7 +40,7 @@ export async function registerUser(
     .values({
       email,
       passwordHash,
-      role: role ?? "user",
+      role: role ?? "member",
       name,
     } satisfies NewUser)
     .returning();
@@ -83,7 +83,7 @@ export async function findOrCreateOAuthUser(
   if (!user) {
     [user] = await db
       .insert(users)
-      .values({ email, oauthProvider: provider, oauthId, role: "user" })
+      .values({ email, oauthProvider: provider, oauthId, role: "member" })
       .returning();
   }
 
@@ -328,7 +328,7 @@ export async function googleOauth(oauthData: OauthRequest) {
       email,
       oauthProvider: "google",
       isEmailVerified: email_verified,
-      role: "user",
+      role: "member",
       name,
     } satisfies NewUser)
     .returning();

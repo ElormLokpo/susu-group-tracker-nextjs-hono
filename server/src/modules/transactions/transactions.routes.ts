@@ -6,6 +6,7 @@ import type { AppEnv } from "../shared";
 
 export const transactionsRoutes = new Hono<AppEnv>();
 
+transactionsRoutes.all("/all", transactionsController.all);
 transactionsRoutes.post(
     "/groups/:groupId/contributions",
     requireRole("admin", "member"),

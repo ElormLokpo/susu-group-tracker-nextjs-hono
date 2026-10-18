@@ -132,7 +132,7 @@ const SignUpForm = () => {
         const { confirmPassword, ...rest } = data;
         void confirmPassword;
 
-        const finalData = { ...rest, role: "user" };
+        const finalData = { ...rest, role: "member" };
         mutate(finalData);
     };
 

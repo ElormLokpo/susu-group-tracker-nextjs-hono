@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { sql, relations } from "drizzle-orm";
 import {
   pgTable,
   uuid,
@@ -12,6 +12,7 @@ import {
   check,
   integer,
 } from "drizzle-orm/pg-core";
+
 
 export const roleEnum = pgEnum("role", ["member", "admin"]);
 export const groupStatus = pgEnum("group_status", ["pending", "active", "completed"]);
@@ -96,3 +97,56 @@ export type Transaction = typeof transactions.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Member = typeof groupMembers.$inferSelect;
+
+
+
+
+export const usersRelations = relations(users, ({ many }) => ({
+  createdGroups: many(groups, { relationName: "group_creator" }),
+  memberships: many(groupMembers),
+  transactions: many(transactions, { relationName: "transaction_user" }),
+  recordedTransactions: many(transactions, { relationName: "transaction_recorder" }),
+}));
+
+
+export const groupsRelations = relations(groups, ({ one, many }) => ({
+  creator: one(users, {
+    fields: [groups.createdBy],
+    references: [users.id],
+    relationName: "group_creator",
+  }),
+  members: many(groupMembers),
+  transactions: many(transactions),
+}));
+
+
+export const groupMembersRelations = relations(groupMembers, ({ one }) => ({
+  group: one(groups, {
+    fields: [groupMembers.groupId],
+    references: [groups.id],
+  }),
+  user: one(users, {
+    fields: [groupMembers.userId],
+    references: [users.id],
+  }),
+}));
+
+
+export const transactionsRelations = relations(transactions, ({ one }) => ({
+  group: one(groups, {
+    fields: [transactions.groupId],
+    references: [groups.id],
+  }),
+  
+  user: one(users, {
+    fields: [transactions.userId],
+    references: [users.id],
+    relationName: "transaction_user",
+  }),
+ 
+  recorder: one(users, {
+    fields: [transactions.recordedBy],
+    references: [users.id],
+    relationName: "transaction_recorder",
+  }),
+}));

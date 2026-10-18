@@ -1,5 +1,13 @@
+"use client"
+
+import { useGetTransactions } from "@/app/hooks/transactionsHook";
+
 
 export default function TransactionsPage() {
+    const { data } = useGetTransactions();
+
+    console.log(data);
+
     return (
         <div >
             <div >
