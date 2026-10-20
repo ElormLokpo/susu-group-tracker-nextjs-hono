@@ -24,18 +24,34 @@ export const createGroup = async (input: { name: string; weeklyAmount: number },
 }
 
 
-export const listGroups = async (user: AuthUser) => {
-    if (user.role === "admin") {
-        const rows = await db.select().from(groups).orderBy(asc(groups.createdAt));
-        return rows.map(serializeGroup);
-    }
-    const rows = await db
-        .select({ group: groups })
-        .from(groups)
-        .innerJoin(groupMembers, eq(groupMembers.groupId, groups.id))
-        .where(eq(groupMembers.userId, user.id))
-        .orderBy(asc(groups.createdAt));
-    return rows.map((r) => serializeGroup(r.group));
+// export const listGroups = async (user: AuthUser) => {
+
+//     if (user.role === "admin") {
+//         const rows = await db.select().from(groups).orderBy(asc(groups.createdAt));
+//         return rows.map(serializeGroup);
+//     }
+//     const rows = await db
+//         .select({ group: groups })
+//         .from(groups)
+//         .innerJoin(groupMembers, eq(groupMembers.groupId, groups.id))
+//         .where(eq(groupMembers.userId, user.id))
+//         .orderBy(asc(groups.createdAt));
+//     return rows.map((r) => serializeGroup(r.group));
+// }
+
+export const listGroups = async () => {
+
+
+    const rows = await db.select().from(groups).orderBy(asc(groups.createdAt));
+    return rows.map(serializeGroup);
+
+    // const rows = await db
+    //     .select({ group: groups })
+    //     .from(groups)
+    //     .innerJoin(groupMembers, eq(groupMembers.groupId, groups.id))
+    //     .where(eq(groupMembers.userId, user.id))
+    //     .orderBy(asc(groups.createdAt));
+    // return rows.map((r) => serializeGroup(r.group));
 }
 
 export const getGroup = async (groupId: string) => {

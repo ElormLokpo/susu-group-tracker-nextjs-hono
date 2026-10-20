@@ -14,7 +14,9 @@ export const createGroup = async (c: C) => {
 }
 
 export const listGroup = async (c: C) => {
-  const data = await groupsService.listGroups(c.get("user"));
+  // const data = await groupsService.listGroups(c.get("user"));
+  const data = await groupsService.listGroups();
+
   return c.json({ data });
 }
 

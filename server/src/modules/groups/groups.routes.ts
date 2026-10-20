@@ -6,7 +6,7 @@ import type { AppEnv } from "../shared";
 export const groupsRoutes = new Hono<AppEnv>();
 
 groupsRoutes.post("/", requireRole("admin"), groupsController.createGroup);
-groupsRoutes.get("/", requireRole("admin", "member"), groupsController.listGroup);
+groupsRoutes.get("/", groupsController.listGroup);
 groupsRoutes.get("/:id", requireRole("admin", "member"), groupsController.getGroup);
 groupsRoutes.post("/:id/members", requireRole("admin"), groupsController.addMember);
 groupsRoutes.post("/:id/start", requireRole("admin"), groupsController.startWeek);

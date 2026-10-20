@@ -10,6 +10,7 @@ import { ProfileImage } from "./dashTopNav";
 import { HiOutlineLogout } from "react-icons/hi";
 import { useAuthStore } from "@/app/store";
 import { useRouter } from "next/navigation";
+import { TbMoneybagPlus } from "react-icons/tb";
 
 
 export default function SideNav() {
@@ -23,15 +24,14 @@ export default function SideNav() {
 
         [
             { name: "Dashboard", href: CLIENT_ROUTES.dashboard, icon: <RxDashboard />, isActive: true },
-            { name: "Transactions", href: CLIENT_ROUTES.dashboardTransactions, icon: <CiMoneyCheck1 /> },
-
             { name: "Groups", href: CLIENT_ROUTES.dashboardGroups, icon: <RiGroupLine /> },
+            { name: "Transactions", href: CLIENT_ROUTES.dashboardTransactions, icon: <TbMoneybagPlus /> },
             { name: "Users", href: CLIENT_ROUTES.dashboardUsers, icon: <LuUserRoundCheck /> },
 
 
         ] : [
             { name: "Home", href: CLIENT_ROUTES.dashboard, icon: <RxDashboard />, isActive: true },
-            { name: "Transactions", href: CLIENT_ROUTES.dashboardTransactions, icon: <CiMoneyCheck1 /> },
+            { name: "Transactions", href: CLIENT_ROUTES.dashboardTransactions, icon: <TbMoneybagPlus /> },
 
         ]
 
