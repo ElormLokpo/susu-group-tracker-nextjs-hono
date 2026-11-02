@@ -9,7 +9,7 @@ export const authMiddleware = createMiddleware<{ Variables: AppVariables }>(
     const headerToken = c.req.header("Authorization")?.replace("Bearer ", "");
     const token = cookieToken ?? headerToken;
 
-    console.log("auth middleware run");
+    
 
     if (!token) {
       return c.json({ error: "Unauthorized" }, 401);
@@ -33,7 +33,7 @@ export function requireRole(roles: Role[]) {
   return createMiddleware<{ Variables: AppVariables }>(async (c, next) => {
     const user = c.get("user");
 
-    console.log("require role run", user, roles);
+  
 
     if (!user) {
       return c.json({ error: "Unauthorized" }, 401);

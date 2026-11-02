@@ -29,7 +29,7 @@ export default function Home() {
 
 const HomepageContent = () => {
   const handleCTAClick = () => {
-    console.log("button clicked")
+ 
   }
 
   return (

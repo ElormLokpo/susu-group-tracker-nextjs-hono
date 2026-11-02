@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { api } from "../api";
 import { API_ROUTES } from "../constants";
 import { useAuthStore } from "../store";
-import { queryClient } from "../providers/query-provider";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 
@@ -28,6 +28,8 @@ export const useGetGroups = () => {
 }
 
 export const useCreateGroup = () => {
+    const queryClient = useQueryClient();
+
     const token = useAuthStore((state) => state.token);
 
     return useMutation({
@@ -46,6 +48,8 @@ export const useCreateGroup = () => {
 }
 
 export const useJoinGroup = () => {
+    const queryClient = useQueryClient();
+
     const token = useAuthStore((state) => state.token);
 
     return useMutation({

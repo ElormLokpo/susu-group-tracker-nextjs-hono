@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/app/components/ui/input";
 import { CLIENT_ROUTES } from "@/app/constants";
 import Link from "next/link";
-import {  useState } from "react";
+import { useState } from "react";
 import { LuCopy } from "react-icons/lu";
 import { IoCheckmarkCircleOutline } from "react-icons/io5";
 import { useCreateGroup } from "@/app/hooks/groupsHook";
@@ -47,6 +47,9 @@ const joinGroupSchema = z.object({
 const isPending = false;
 
 
+
+
+
 export type CreateGroupValues = z.infer<typeof createGroupSchema>;
 type JoinGroupValues = z.infer<typeof joinGroupSchema>;
 
@@ -55,6 +58,7 @@ export const InitiateUserPage = () => {
 
 
     return (
+
         <div className="grid grid-cols-2">
             <div
                 className="bg-contain bg-center bg-no-repeat "
@@ -64,10 +68,7 @@ export const InitiateUserPage = () => {
                     <div className="p-10 ">
                         <Link href={CLIENT_ROUTES.home} className="text-lime-500 font-semibold text-xl hover:underline">SuSu</Link>
                     </div>
-
-
                 </div>
-
             </div>
 
             <div className="h-screen bg-white flex justify-center items-center">
@@ -76,6 +77,7 @@ export const InitiateUserPage = () => {
                 }
             </div>
         </div>
+
 
     )
 }
@@ -94,7 +96,7 @@ const JoinGroupForm = ({ setCurrentForm }: { setCurrentForm: (form: string) => v
 
 
     const onSubmit = async (data: JoinGroupValues) => {
-        console.log(data)
+        void data;
 
     };
 
@@ -147,7 +149,7 @@ const CreateGroupForm = ({ setCurrentForm }: { setCurrentForm: (form: string) =>
     const {
         register,
         handleSubmit,
-       
+
         formState: { errors },
     } = useForm<CreateGroupValues>({
         resolver: zodResolver(createGroupSchema),
@@ -160,7 +162,7 @@ const CreateGroupForm = ({ setCurrentForm }: { setCurrentForm: (form: string) =>
 
 
     const onSubmit = async (data: CreateGroupValues) => {
-        console.log(data);
+
         const finalData = {
             ...data,
             weeklyAmount: Number(data.weeklyAmount),

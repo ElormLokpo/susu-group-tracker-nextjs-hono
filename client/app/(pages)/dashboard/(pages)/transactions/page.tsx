@@ -35,7 +35,7 @@ export default function TransactionsPage() {
 
     const { data: transactions = [] } = useGetTransactions();
 
-    console.log(transactions);
+   
 
     return (
         <div >

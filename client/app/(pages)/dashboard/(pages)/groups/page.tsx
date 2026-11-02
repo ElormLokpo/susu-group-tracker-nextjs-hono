@@ -13,20 +13,20 @@ export default function GroupsPage() {
         error,
         refetch
     } = useGetGroups();
-    console.log("GROUPS", groups);
+
 
 
     const handleUpdateGroup = async (
         id: string,
         values: UpdateGroupInput
     ) => {
-
-        console.log("Update Group", id, values);
+        void id;
+        void values;
 
     };
 
     const handleDeleteGroup = async (id: string) => {
-        console.log("Delete Group", id);
+
 
     };
 
