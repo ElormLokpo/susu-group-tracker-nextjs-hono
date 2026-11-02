@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { sql, relations } from "drizzle-orm";
 import {
   pgTable,
   uuid,
@@ -14,8 +14,15 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const roleEnum = pgEnum("role", ["member", "admin"]);
-export const groupStatus = pgEnum("group_status", ["pending", "active", "completed"]);
-export const transactionType = pgEnum("transaction_type", ["contribution", "payout"]);
+export const groupStatus = pgEnum("group_status", [
+  "pending",
+  "active",
+  "completed",
+]);
+export const transactionType = pgEnum("transaction_type", [
+  "contribution",
+  "payout",
+]);
 const pesewas = (name: string) => bigint(name, { mode: "number" });
 
 export const users = pgTable("users", {
@@ -36,7 +43,6 @@ export const users = pgTable("users", {
   deleteAt: timestamp("delete_at"),
 });
 
-
 export const groups = pgTable(
   "groups",
   {
@@ -45,22 +51,33 @@ export const groups = pgTable(
     weeklyAmount: pesewas("weekly_amount").notNull(),
     status: groupStatus("status").notNull().default("pending"),
     currentWeek: integer("current_week").notNull().default(1),
-    createdBy: uuid("created_by").notNull().references(() => users.id),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    maxNumberOfMembers: integer("max_number_of_members").notNull().default(5),
+    inviteLink: text("invite_link"),
+    createdBy: uuid("created_by")
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => [check("groups_weekly_amount_positive", sql`${t.weeklyAmount} > 0`)],
 );
-
 
 export const groupMembers = pgTable(
   "group_members",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    groupId: uuid("group_id").notNull().references(() => groups.id, { onDelete: "cascade" }),
-    userId: uuid("user_id").notNull().references(() => users.id),
-   
+    groupId: uuid("group_id")
+      .notNull()
+      .references(() => groups.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+
     position: integer("position").notNull(),
-    joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
+    joinedAt: timestamp("joined_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => [
     uniqueIndex("group_members_group_user_idx").on(t.groupId, t.userId),
@@ -68,18 +85,25 @@ export const groupMembers = pgTable(
   ],
 );
 
-
 export const transactions = pgTable(
   "transactions",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    groupId: uuid("group_id").notNull().references(() => groups.id, { onDelete: "cascade" }),
-    userId: uuid("user_id").notNull().references(() => users.id),
+    groupId: uuid("group_id")
+      .notNull()
+      .references(() => groups.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
     type: transactionType("type").notNull(),
     week: integer("week").notNull(),
     amount: pesewas("amount").notNull(),
-    recordedBy: uuid("recorded_by").notNull().references(() => users.id),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    recordedBy: uuid("recorded_by")
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (t) => [
     index("transactions_group_week_idx").on(t.groupId, t.week),
@@ -90,9 +114,57 @@ export const transactions = pgTable(
   ],
 );
 
-
 export type Group = typeof groups.$inferSelect;
 export type Transaction = typeof transactions.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Member = typeof groupMembers.$inferSelect;
+
+export const usersRelations = relations(users, ({ many }) => ({
+  createdGroups: many(groups, { relationName: "group_creator" }),
+  memberships: many(groupMembers),
+  transactions: many(transactions, { relationName: "transaction_user" }),
+  recordedTransactions: many(transactions, {
+    relationName: "transaction_recorder",
+  }),
+}));
+
+export const groupsRelations = relations(groups, ({ one, many }) => ({
+  creator: one(users, {
+    fields: [groups.createdBy],
+    references: [users.id],
+    relationName: "group_creator",
+  }),
+  members: many(groupMembers),
+  transactions: many(transactions),
+}));
+
+export const groupMembersRelations = relations(groupMembers, ({ one }) => ({
+  group: one(groups, {
+    fields: [groupMembers.groupId],
+    references: [groups.id],
+  }),
+  user: one(users, {
+    fields: [groupMembers.userId],
+    references: [users.id],
+  }),
+}));
+
+export const transactionsRelations = relations(transactions, ({ one }) => ({
+  group: one(groups, {
+    fields: [transactions.groupId],
+    references: [groups.id],
+  }),
+
+  user: one(users, {
+    fields: [transactions.userId],
+    references: [users.id],
+    relationName: "transaction_user",
+  }),
+
+  recorder: one(users, {
+    fields: [transactions.recordedBy],
+    references: [users.id],
+    relationName: "transaction_recorder",
+  }),
+}));

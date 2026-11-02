@@ -1,159 +1,314 @@
 import { and, asc, eq, sql } from "drizzle-orm";
 import { db } from "../../db";
-import { groupMembers, groups, transactions, users } from "../../db/schema";
+import {
+  groupMembers,
+  groups,
+  transactions,
+  users,
+  type NewUser,
+} from "../../db/schema";
 import type { AuthUser } from "../auth/auth.types";
-import { ConflictError, ForbiddenError, NotFoundError } from "../../utils/errors";
+import {
+  ConflictError,
+  ForbiddenError,
+  NotFoundError,
+} from "../../utils/errors";
 import { formatGHS } from "../../utils/money";
 import {
-    findGroup,
-    getWeekBalances,
-    listMembers,
-    lockGroup,
-    serializeGroup,
+  findGroup,
+  getWeekBalances,
+  listMembers,
+  lockGroup,
+  serializeGroup,
 } from "../shared";
+import bcrypt from "bcryptjs";
+import { signToken } from "../auth/auth.jwt";
+import {
+  buildPayload,
+  generateAndSendVerificationCode,
+} from "../auth/auth.services";
 
 const MIN_MEMBERS = 2;
 
+export const createGroup = async (
+  input: { name: string; weeklyAmount: number; maxNumberOfMembers: number },
+  createdBy: string,
+) => {
+  const inviteLink = crypto.randomUUID();
 
-export const createGroup = async (input: { name: string; weeklyAmount: number }, createdBy: string) => {
-    const [row] = await db
-        .insert(groups)
-        .values({ name: input.name, weeklyAmount: input.weeklyAmount, createdBy })
-        .returning();
-    return serializeGroup(row);
-}
+  const [row] = await db
+    .insert(groups)
+    .values({
+      name: input.name,
+      weeklyAmount: input.weeklyAmount,
+      createdBy,
+      maxNumberOfMembers: input.maxNumberOfMembers,
+      inviteLink,
+    })
+    .returning();
+  return serializeGroup(row);
+};
 
+// export const listGroups = async (user: AuthUser) => {
 
-export const listGroups = async (user: AuthUser) => {
-    if (user.role === "admin") {
-        const rows = await db.select().from(groups).orderBy(asc(groups.createdAt));
-        return rows.map(serializeGroup);
-    }
-    const rows = await db
-        .select({ group: groups })
-        .from(groups)
-        .innerJoin(groupMembers, eq(groupMembers.groupId, groups.id))
-        .where(eq(groupMembers.userId, user.id))
-        .orderBy(asc(groups.createdAt));
-    return rows.map((r) => serializeGroup(r.group));
-}
+//     if (user.role === "admin") {
+//         const rows = await db.select().from(groups).orderBy(asc(groups.createdAt));
+//         return rows.map(serializeGroup);
+//     }
+//     const rows = await db
+//         .select({ group: groups })
+//         .from(groups)
+//         .innerJoin(groupMembers, eq(groupMembers.groupId, groups.id))
+//         .where(eq(groupMembers.userId, user.id))
+//         .orderBy(asc(groups.createdAt));
+//     return rows.map((r) => serializeGroup(r.group));
+// }
+
+export const listGroups = async () => {
+  const rows = await db.select().from(groups).orderBy(asc(groups.createdAt));
+  return rows.map(serializeGroup);
+
+  // const rows = await db
+  //     .select({ group: groups })
+  //     .from(groups)
+  //     .innerJoin(groupMembers, eq(groupMembers.groupId, groups.id))
+  //     .where(eq(groupMembers.userId, user.id))
+  //     .orderBy(asc(groups.createdAt));
+  // return rows.map((r) => serializeGroup(r.group));
+};
 
 export const getGroup = async (groupId: string) => {
-    const group = await findGroup(db, groupId);
-    const members = await listMembers(db, groupId);
-    return {
-        ...serializeGroup(group),
-        members: members.map((m) => ({ userId: m.userId, name: m.name, position: m.position, joinedAt: m.joinedAt })),
-    };
-}
-
+  const group = await findGroup(db, groupId);
+  const members = await listMembers(db, groupId);
+  return {
+    ...serializeGroup(group),
+    members: members.map((m) => ({
+      userId: m.userId,
+      name: m.name,
+      position: m.position,
+      joinedAt: m.joinedAt,
+    })),
+  };
+};
 
 export const assertCanView = async (user: AuthUser, groupId: string) => {
-    await findGroup(db, groupId);
-    if (user.role === "admin") return;
-    const [row] = await db
+  await findGroup(db, groupId);
+  if (user.role === "admin") return;
+  const [row] = await db
+    .select({ id: groupMembers.id })
+    .from(groupMembers)
+    .where(
+      and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, user.id)),
+    )
+    .limit(1);
+  if (!row) throw new ForbiddenError("You are not a member of this group");
+};
+
+export const joinGroup = async (input: {
+  role: "member" | "admin";
+  inviteId: string;
+  name: string;
+  email: string;
+  password: string;
+}) => {
+  return db.transaction(async (tx) => {
+    const [group] = await tx
+      .select()
+      .from(groups)
+      .where(eq(groups.inviteLink, input.inviteId))
+      .limit(1);
+    if (!group) throw new NotFoundError("Group not found", "GROUP_NOT_FOUND");
+
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.email, input.email),
+    });
+
+    if (existingUser) {
+      const [dup] = await tx
         .select({ id: groupMembers.id })
         .from(groupMembers)
-        .where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, user.id)))
+        .where(
+          and(
+            eq(groupMembers.groupId, group.id),
+            eq(groupMembers.userId, existingUser.id),
+          ),
+        )
         .limit(1);
-    if (!row) throw new ForbiddenError("You are not a member of this group");
-}
+      if (dup)
+        throw new ConflictError(
+          `${existingUser.name} is already in this group`,
+          "DUPLICATE_MEMBER",
+        );
 
-export const addMember = async (groupId: string, userId: string) => {
-    return db.transaction(async (tx) => {
-        const group = await lockGroup(tx, groupId);
-        if (group.status !== "pending") {
-            throw new ConflictError(
-                "Members can only be added before the group has started (payout order is fixed once week 1 begins)",
-                "GROUP_ALREADY_STARTED",
-            );
-        }
+      const [{ max }] = await tx
+        .select({
+          max: sql<string>`coalesce(max(${groupMembers.position}), 0)`,
+        })
+        .from(groupMembers)
+        .where(eq(groupMembers.groupId, group.id));
 
-        const [user] = await tx.select().from(users).where(eq(users.id, userId)).limit(1);
-        if (!user) throw new NotFoundError("User not found", "USER_NOT_FOUND");
+      const totalGroupMembers = await db.$count(
+        groupMembers,
+        eq(groupMembers.groupId, group.id),
+      );
 
-        const [dup] = await tx
-            .select({ id: groupMembers.id })
-            .from(groupMembers)
-            .where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, userId)))
-            .limit(1);
-        if (dup) throw new ConflictError(`${user.name} is already in this group`, "DUPLICATE_MEMBER");
+      if (totalGroupMembers >= group.maxNumberOfMembers)
+        throw new ConflictError(`Group is already full`, "GROUP_FULL");
 
-        const [{ max }] = await tx
-            .select({ max: sql<string>`coalesce(max(${groupMembers.position}), 0)` })
-            .from(groupMembers)
-            .where(eq(groupMembers.groupId, groupId));
+      await tx
+        .insert(groupMembers)
+        .values({
+          groupId: group.id,
+          userId: existingUser.id,
+          position: Number(max) + 1,
+        })
+        .returning();
 
-        const [row] = await tx
-            .insert(groupMembers)
-            .values({ groupId, userId, position: Number(max) + 1 })
-            .returning();
+      const token = await signToken(buildPayload(existingUser));
 
-        return { groupId, userId: row.userId, name: user.name, position: row.position, joinedAt: row.joinedAt };
-    });
-}
+      return token;
+    }
 
+    const passwordHash = await bcrypt.hash(input.password, 12);
+
+    const [user] = await db
+      .insert(users)
+      .values({
+        email: input.email,
+        passwordHash,
+        role: "member",
+        name: input.name,
+      } satisfies NewUser)
+      .returning();
+
+    const [dup] = await tx
+      .select({ id: groupMembers.id })
+      .from(groupMembers)
+      .where(
+        and(
+          eq(groupMembers.groupId, group.id),
+          eq(groupMembers.userId, user.id),
+        ),
+      )
+      .limit(1);
+    if (dup)
+      throw new ConflictError(
+        `${user.name} is already in this group`,
+        "DUPLICATE_MEMBER",
+      );
+
+    const [{ max }] = await tx
+      .select({ max: sql<string>`coalesce(max(${groupMembers.position}), 0)` })
+      .from(groupMembers)
+      .where(eq(groupMembers.groupId, group.id));
+
+    const totalGroupMembers = await db.$count(
+      groupMembers,
+      eq(groupMembers.groupId, group.id),
+    );
+
+    if (totalGroupMembers >= group.maxNumberOfMembers)
+      throw new ConflictError(`Group is already full`, "GROUP_FULL");
+
+    await tx
+      .insert(groupMembers)
+      .values({ groupId: group.id, userId: user.id, position: Number(max) + 1 })
+      .returning();
+
+    const token = await signToken(buildPayload(user));
+    await generateAndSendVerificationCode(user.id, input.email);
+
+    return token;
+  });
+};
 
 export const startWeek = async (groupId: string) => {
-    return db.transaction(async (tx) => {
-        const group = await lockGroup(tx, groupId);
-        if (group.status !== "pending") {
-            throw new ConflictError(`Group is already ${group.status}`, "GROUP_ALREADY_STARTED");
-        }
-        const members = await listMembers(tx, groupId);
-        if (members.length < MIN_MEMBERS) {
-            throw new ConflictError(`A susu needs at least ${MIN_MEMBERS} members to start`, "NOT_ENOUGH_MEMBERS");
-        }
-        const [updated] = await tx
-            .update(groups)
-            .set({ status: "active", currentWeek: 1 })
-            .where(eq(groups.id, groupId))
-            .returning();
-
-        return {
-            ...serializeGroup(updated),
-            payoutOrder: members.map((m) => ({ week: m.position, userId: m.userId, name: m.name })),
-        };
-    });
-}
-
-export const getReport = async (groupId: string) => {
-    const group = await findGroup(db, groupId);
-    const members = await listMembers(db, groupId);
-    const isActive = group.status === "active";
-
-    const balances = isActive ? await getWeekBalances(db, group, group.currentWeek) : [];
-    const recipient = isActive ? members.find((m) => m.position === group.currentWeek) : undefined;
-
-    const payoutRows = await db
-        .select({
-            week: transactions.week,
-            amount: transactions.amount,
-            userId: transactions.userId,
-            name: users.name,
-            paidOutAt: transactions.createdAt,
-        })
-        .from(transactions)
-        .innerJoin(users, eq(users.id, transactions.userId))
-        .where(and(eq(transactions.groupId, groupId), eq(transactions.type, "payout")))
-        .orderBy(asc(transactions.week));
+  return db.transaction(async (tx) => {
+    const group = await lockGroup(tx, groupId);
+    if (group.status !== "pending") {
+      throw new ConflictError(
+        `Group is already ${group.status}`,
+        "GROUP_ALREADY_STARTED",
+      );
+    }
+    const members = await listMembers(tx, groupId);
+    if (members.length < MIN_MEMBERS) {
+      throw new ConflictError(
+        `A susu needs at least ${MIN_MEMBERS} members to start`,
+        "NOT_ENOUGH_MEMBERS",
+      );
+    }
+    const [updated] = await tx
+      .update(groups)
+      .set({ status: "active", currentWeek: 1 })
+      .where(eq(groups.id, groupId))
+      .returning();
 
     return {
-        group: serializeGroup(group),
-        currentWeek: group.currentWeek,
-        totalWeeks: members.length,
-        currentRecipient: recipient ? { userId: recipient.userId, name: recipient.name } : null,
-        paidInFull: balances
-            .filter((b) => b.owes === 0)
-            .map((b) => ({ userId: b.userId, name: b.name, paid: formatGHS(b.paid) })),
-        owing: balances
-            .filter((b) => b.owes > 0)
-            .map((b) => ({ userId: b.userId, name: b.name, paid: formatGHS(b.paid), owes: formatGHS(b.owes) })),
-        payoutHistory: payoutRows.map((p) => ({
-            week: p.week,
-            recipient: { userId: p.userId, name: p.name },
-            amount: formatGHS(p.amount),
-            paidOutAt: p.paidOutAt,
-        })),
+      ...serializeGroup(updated),
+      payoutOrder: members.map((m) => ({
+        week: m.position,
+        userId: m.userId,
+        name: m.name,
+      })),
     };
-}
+  });
+};
+
+export const getReport = async (groupId: string) => {
+  const group = await findGroup(db, groupId);
+  const members = await listMembers(db, groupId);
+  const isActive = group.status === "active";
+
+  const balances = isActive
+    ? await getWeekBalances(db, group, group.currentWeek)
+    : [];
+  const recipient = isActive
+    ? members.find((m) => m.position === group.currentWeek)
+    : undefined;
+
+  const payoutRows = await db
+    .select({
+      week: transactions.week,
+      amount: transactions.amount,
+      userId: transactions.userId,
+      name: users.name,
+      paidOutAt: transactions.createdAt,
+    })
+    .from(transactions)
+    .innerJoin(users, eq(users.id, transactions.userId))
+    .where(
+      and(eq(transactions.groupId, groupId), eq(transactions.type, "payout")),
+    )
+    .orderBy(asc(transactions.week));
+
+  return {
+    group: serializeGroup(group),
+    currentWeek: group.currentWeek,
+    totalWeeks: members.length,
+    currentRecipient: recipient
+      ? { userId: recipient.userId, name: recipient.name }
+      : null,
+    paidInFull: balances
+      .filter((b) => b.owes === 0)
+      .map((b) => ({
+        userId: b.userId,
+        name: b.name,
+        paid: formatGHS(b.paid),
+      })),
+    owing: balances
+      .filter((b) => b.owes > 0)
+      .map((b) => ({
+        userId: b.userId,
+        name: b.name,
+        paid: formatGHS(b.paid),
+        owes: formatGHS(b.owes),
+      })),
+    payoutHistory: payoutRows.map((p) => ({
+      week: p.week,
+      recipient: { userId: p.userId, name: p.name },
+      amount: formatGHS(p.amount),
+      paidOutAt: p.paidOutAt,
+    })),
+  };
+};

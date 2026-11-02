@@ -1,13 +1,41 @@
 import { Hono } from "hono";
 import * as groupsController from "./groups.controller";
-import { requireRole } from "../auth/auth.middleware";
+import { authMiddleware, requireRole } from "../auth/auth.middleware";
 import type { AppEnv } from "../shared";
+import { Role } from "../auth/auth.types";
 
 export const groupsRoutes = new Hono<AppEnv>();
 
-groupsRoutes.post("/", requireRole("admin"), groupsController.createGroup);
-groupsRoutes.get("/", requireRole("admin", "member"), groupsController.listGroup);
-groupsRoutes.get("/:id", requireRole("admin", "member"), groupsController.getGroup);
-groupsRoutes.post("/:id/members", requireRole("admin"), groupsController.addMember);
-groupsRoutes.post("/:id/start", requireRole("admin"), groupsController.startWeek);
-groupsRoutes.get("/:id/report", requireRole("admin", "member"), groupsController.getReport);
+groupsRoutes.post(
+  "/",
+  authMiddleware,
+  requireRole([Role.admin, Role.member]),
+  groupsController.createGroup,
+);
+groupsRoutes.get(
+  "/",
+  authMiddleware,
+  requireRole([Role.admin]),
+  groupsController.listGroup,
+);
+groupsRoutes.get(
+  "/:id",
+  authMiddleware,
+  requireRole([Role.admin, Role.member]),
+  groupsController.getGroup,
+);
+
+groupsRoutes.post("/members/join", groupsController.joinGroup);
+
+groupsRoutes.post(
+  "/:id/start",
+  authMiddleware,
+  requireRole([Role.admin, Role.member]),
+  groupsController.startWeek,
+);
+groupsRoutes.get(
+  "/:id/report",
+  authMiddleware,
+  requireRole([Role.admin, Role.member]),
+  groupsController.getReport,
+);

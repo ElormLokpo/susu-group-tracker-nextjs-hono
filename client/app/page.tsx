@@ -1,18 +1,16 @@
 "use client"
 import { GoArrowUpRight } from "react-icons/go";
 import { TopNav } from "./components/topNav";
-import { CLIENT_ROUTES } from "./constants";
-import Link from "next/link";
 
 
 
 export default function Home() {
-  
+
 
   return (
     <div className="">
       <div className="hidden md:block fixed top-0 w-full h-full z-10 ">
-        <TopNav  />
+        <TopNav />
       </div>
 
       <div className="py-3 md:py-5 lg:py-10 text-stone-800">
@@ -30,6 +28,10 @@ export default function Home() {
 
 
 const HomepageContent = () => {
+  const handleCTAClick = () => {
+ 
+  }
+
   return (
     <div className="px-3 md:px-10 lg:px-20">
       <div className="pt-10 md:pt-30 mb-10 rounded-3xl md:p-10">
@@ -52,92 +54,95 @@ const HomepageContent = () => {
         </div>
 
         <div className="flex items-center justify-center mb-10 md:mb-20 lg:mb-20 2xl:mb-50">
-          <Link href={CLIENT_ROUTES.auth} className=" md:text-xs lg:text-normal flex items-center animate-bounce bg-stone-900 text-stone-100 gap-3 pr-2 pl-5 shadow-xl shadow-lime-500 py-2 rounded-full"> Get started with SuSu<span className="bg-white text-stone-900 p-2 text-xl rounded-full"> <GoArrowUpRight /> </span></Link>
+          <button onClick={()=>handleCTAClick()} className="hover:cursor-pointer md:text-xs lg:text-normal flex items-center animate-bounce bg-stone-900 text-stone-100 gap-3 pr-2 pl-5 shadow-xl shadow-lime-500 py-2 rounded-full">
+            Get started with SuSu<span className="bg-white text-stone-900 p-2 text-xl rounded-full"> <GoArrowUpRight /> </span>
+          </button>
         </div>
 
-        
+
+
 
       </div>
 
       <div className=" md:grid md:grid-cols-3 md:gap-2 lg:gap-3 2xl:gap-10 md:h-100 lg:h-150  mb-20">
-          <div className="mb-5 md:mb-0 md:col-span-2 h-100  md:h-full rounded-2xl" style={{ backgroundImage: "url(https://images.unsplash.com/photo-1655720357740-bdf90f34483f?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D)", backgroundSize: "cover", backgroundPosition: "center" }}>{" "}</div>
+        <div className="mb-5 md:mb-0 md:col-span-2 h-100  md:h-full rounded-2xl" style={{ backgroundImage: "url(https://images.unsplash.com/photo-1655720357740-bdf90f34483f?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D)", backgroundSize: "cover", backgroundPosition: "center" }}>{" "}</div>
 
-          <div className="md:cols-span-1 rounded-2xl bg-[#122020] text-stone-100 p-2">
-            <div className="border rounded-2xl h-full p-3 md:p-4 lg:p-10 border-stone-600">
+        <div className="md:cols-span-1 rounded-2xl bg-[#122020] text-stone-100 p-2">
+          <div className="border rounded-2xl h-full p-3 md:p-4 lg:p-10 border-stone-600">
 
-              <div className="md:mb-10 lg:mb-10">
-                <div className="grid grid-cols-7 gap-3 mb-3">
+            <div className="md:mb-10 lg:mb-10">
+              <div className="grid grid-cols-7 gap-3 mb-3">
 
-                  {Array(5).fill(0).map((_, index) => (
-                    <div key={index} className="bg-lime-500 w-5 h-5 md:w-3 md:h-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
+                {Array(5).fill(0).map((_, index) => (
+                  <div key={index} className="bg-lime-500 w-5 h-5 md:w-3 md:h-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
 
-                    </div>
-                  ))}
+                  </div>
+                ))}
 
-                  {Array(2).fill(0).map((_, index) => (
-                    <div key={index} className="bg-lime-200 w-5 h-5 md:h-3 md:w-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
+                {Array(2).fill(0).map((_, index) => (
+                  <div key={index} className="bg-lime-200 w-5 h-5 md:h-3 md:w-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
 
-                    </div>
-                  ))}
-                </div>
-
-                <div className="grid grid-cols-7 gap-3 mb-3">
-
-                  {Array(3).fill(0).map((_, index) => (
-                    <div key={index} className="bg-lime-500 w-5 h-5 md:w-3 md:h-3  lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
-
-                    </div>
-                  ))}
-
-                  {Array(4).fill(0).map((_, index) => (
-                    <div key={index} className="bg-lime-200 w-5 h-5  md:w-3 md:h-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
-
-                    </div>
-                  ))}
-                </div>
-
-                <div className="grid grid-cols-7 gap-3 mb-7 md:mb-3">
-
-                  {Array(2).fill(0).map((_, index) => (
-                    <div key={index} className="bg-lime-500 w-5 h-5 md:w-3 md:h-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
-
-                    </div>
-                  ))}
-
-                  {Array(5).fill(0).map((_, index) => (
-                    <div key={index} className="bg-lime-200 w-5 h-5 md:w-3 md:h-3  lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
-
-                    </div>
-                  ))}
-                </div>
-
+                  </div>
+                ))}
               </div>
 
-              <div className="flex justify-between items-baseline mb-10">
-                <span className="lg:text-[50px] 2xl:text-[72px] ">6.5X</span>
-                <span className="text-[18px] text-stone-300">Blended POT</span>
+              <div className="grid grid-cols-7 gap-3 mb-3">
+
+                {Array(3).fill(0).map((_, index) => (
+                  <div key={index} className="bg-lime-500 w-5 h-5 md:w-3 md:h-3  lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
+
+                  </div>
+                ))}
+
+                {Array(4).fill(0).map((_, index) => (
+                  <div key={index} className="bg-lime-200 w-5 h-5  md:w-3 md:h-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
+
+                  </div>
+                ))}
               </div>
 
+              <div className="grid grid-cols-7 gap-3 mb-7 md:mb-3">
 
-              <div className="pt-10 border-t border-stone-600">
-                <div className="md:text-[18px] lg:text-[20px] 2xl:text-[23px] mb-10 font-semibold lg:w-60">Built for fairness, and steady savings</div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-[18px] text-stone-300"> POT in 5 days</span>
-                  <span className="lg:text-[30px] 2xl:text-[42px]">100%</span>
-                </div>
+                {Array(2).fill(0).map((_, index) => (
+                  <div key={index} className="bg-lime-500 w-5 h-5 md:w-3 md:h-3 lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
+
+                  </div>
+                ))}
+
+                {Array(5).fill(0).map((_, index) => (
+                  <div key={index} className="bg-lime-200 w-5 h-5 md:w-3 md:h-3  lg:w-8 lg:h-8 2xl:w-12 2xl:h-12 rounded-full">
+
+                  </div>
+                ))}
               </div>
 
             </div>
+
+            <div className="flex justify-between items-baseline mb-10">
+              <span className="lg:text-[50px] 2xl:text-[72px] ">6.5X</span>
+              <span className="text-[18px] text-stone-300">Blended POT</span>
+            </div>
+
+
+            <div className="pt-10 border-t border-stone-600">
+              <div className="md:text-[18px] lg:text-[20px] 2xl:text-[23px] mb-10 font-semibold lg:w-60">Built for fairness, and steady savings</div>
+              <div className="flex justify-between items-baseline">
+                <span className="text-[18px] text-stone-300"> POT in 5 days</span>
+                <span className="lg:text-[30px] 2xl:text-[42px]">100%</span>
+              </div>
+            </div>
+
           </div>
         </div>
+      </div>
 
-        <div className="bg-stone-900 px-5 rounded-3xl mb-20 lg:mb-30 2xl:mb-50 text-stone-100 py-50 lg:px-90" >
-          <div className="md:text-[25px] lg:text-[30px] 2xl:text-[42px]">
-            Most savings groups run on trust. We run on clarity.
+      <div className="bg-stone-900 px-5 rounded-3xl mb-20 lg:mb-30 2xl:mb-50 text-stone-100 py-50 lg:px-90" >
+        <div className="md:text-[25px] lg:text-[30px] 2xl:text-[42px]">
+          Most savings groups run on trust. We run on clarity.
 
-            <span className="text-lime-500">Every contribution is tracked, and every payout follows the order. </span> That loop is the entire system.
-          </div>
+          <span className="text-lime-500">Every contribution is tracked, and every payout follows the order. </span> That loop is the entire system.
         </div>
+      </div>
 
 
 
@@ -228,7 +233,7 @@ const HomepageContent = () => {
 
       </div>
 
-    
+
 
     </div>
   )

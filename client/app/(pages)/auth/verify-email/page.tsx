@@ -92,7 +92,7 @@ const VerifyEmailForm = () => {
         </button>
 
         <div className="w-full flex justify-center items-center mt-2 text-xs underline text-gray-500">
-          <Link href={CLIENT_ROUTES.dashboard}>Skip for now</Link>
+          <Link href={CLIENT_ROUTES.initiateUser}>Skip for now</Link>
         </div>
       </form>
     </div>
