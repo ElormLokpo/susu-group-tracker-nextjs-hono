@@ -1,6 +1,13 @@
 import { and, asc, eq, sql } from "drizzle-orm";
 import type { Executor, Tx } from "../db";
-import { type Group, type Transaction, groupMembers, groups, transactions, users } from "../db/schema";
+import {
+  type Group,
+  type Transaction,
+  groupMembers,
+  groups,
+  transactions,
+  users,
+} from "../db/schema";
 import { NotFoundError } from "../utils/errors";
 import { CURRENCY, formatGHS } from "../utils/money";
 import { AuthUser } from "./auth/auth.types";
@@ -11,15 +18,22 @@ export type AppEnv = {
   };
 };
 
-
 export async function lockGroup(tx: Tx, groupId: string): Promise<Group> {
-  const [group] = await tx.select().from(groups).where(eq(groups.id, groupId)).for("update");
+  const [group] = await tx
+    .select()
+    .from(groups)
+    .where(eq(groups.id, groupId))
+    .for("update");
   if (!group) throw new NotFoundError("Group not found", "GROUP_NOT_FOUND");
   return group;
 }
 
 export async function findGroup(ex: Executor, groupId: string): Promise<Group> {
-  const [group] = await ex.select().from(groups).where(eq(groups.id, groupId)).limit(1);
+  const [group] = await ex
+    .select()
+    .from(groups)
+    .where(eq(groups.id, groupId))
+    .limit(1);
   if (!group) throw new NotFoundError("Group not found", "GROUP_NOT_FOUND");
   return group;
 }
@@ -38,8 +52,11 @@ export async function listMembers(ex: Executor, groupId: string) {
     .orderBy(asc(groupMembers.position));
 }
 
-
-export async function getWeekBalances(ex: Executor, group: Group, week: number) {
+export async function getWeekBalances(
+  ex: Executor,
+  group: Group,
+  week: number,
+) {
   const members = await listMembers(ex, group.id);
   const paidRows = await ex
     .select({
@@ -71,6 +88,8 @@ export function serializeGroup(g: Group) {
     weeklyAmount: formatGHS(g.weeklyAmount),
     currency: CURRENCY,
     status: g.status,
+    maxNumberOfMembers: g.maxNumberOfMembers,
+    inviteLink: g.inviteLink,
     currentWeek: g.currentWeek,
     createdBy: g.createdBy,
     createdAt: g.createdAt,
@@ -91,7 +110,6 @@ export function serializeTransaction(t: Transaction) {
   };
 }
 
-
 type rawTransactions = {
   id: string;
   groupId: string;
@@ -104,8 +122,7 @@ type rawTransactions = {
   userName: string | null;
   groupName: string | null;
   recorderName: string | null;
-}
-
+};
 
 export function serializeAllTransactions(t: rawTransactions) {
   return {
@@ -123,4 +140,3 @@ export function serializeAllTransactions(t: rawTransactions) {
     recorderName: t.recorderName ?? "System",
   };
 }
-

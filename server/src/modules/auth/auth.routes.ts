@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import * as authController from "./auth.controller";
-import { type AppVariables } from "./auth.types";
+import { Role, type AppVariables } from "./auth.types";
 import { authMiddleware, requireRole } from "./auth.middleware";
 
 import {
@@ -46,7 +46,7 @@ auth.post(
 auth.delete(
   "/delete-user/:id",
   authMiddleware,
-  requireRole("admin"),
+  requireRole([Role.admin]),
   authController.deleteUser,
 );
 

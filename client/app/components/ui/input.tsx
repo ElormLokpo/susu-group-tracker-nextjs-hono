@@ -33,7 +33,7 @@ const inputVariants = cva(
     },
 );
 
-export interface IInputProps<T extends Record<string, object | string>>
+export interface IInputProps<T extends Record<string, object | string | number>>
     extends
     Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "name">,
     VariantProps<typeof inputVariants> {
@@ -47,7 +47,7 @@ export interface IInputProps<T extends Record<string, object | string>>
     inputType?: string;
 }
 
-export const Input = <T extends Record<string, object | string>>({
+export const Input = <T extends Record<string, object | string | number>>({
     name,
     label,
     register,
@@ -96,7 +96,7 @@ export const Input = <T extends Record<string, object | string>>({
                     {...registerProps}
                     {...props}
                     onChange={(e) => {
-                     
+
                         onChange?.(e);
                     }}
                 />

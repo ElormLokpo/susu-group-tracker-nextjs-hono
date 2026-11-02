@@ -1,6 +1,6 @@
 "use client";
 import { IoWalletOutline } from "react-icons/io5";
-import GroupsTable from "./components/groups-table";
+import GroupsTable, { UpdateGroupInput } from "./components/groups-table";
 import { PiChartLineUp } from "react-icons/pi";
 import { useGetGroups } from "@/app/hooks/groupsHook";
 
@@ -15,6 +15,21 @@ export default function GroupsPage() {
     } = useGetGroups();
     console.log("GROUPS", groups);
 
+
+    const handleUpdateGroup = async (
+        id: string,
+        values: UpdateGroupInput
+    ) => {
+
+        console.log("Update Group", id, values);
+
+    };
+
+    const handleDeleteGroup = async (id: string) => {
+        console.log("Delete Group", id);
+
+    };
+
     return (
         <div >
             <div >
@@ -28,7 +43,10 @@ export default function GroupsPage() {
                                 isLoading={isLoading}
                                 error={error instanceof Error ? error.message : null}
                                 onRetry={() => void refetch()}
-                            />;
+
+                                onUpdate={handleUpdateGroup}
+                                onDelete={handleDeleteGroup}
+                            />
                         </div>
                     </div>
 

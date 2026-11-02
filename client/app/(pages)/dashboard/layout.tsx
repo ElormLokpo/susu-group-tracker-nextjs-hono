@@ -1,19 +1,15 @@
 "use client"
-import { Suspense, useEffect } from "react";
-import { DashTopNav } from "./components/dashTopNav";
-import DatePickerDashboard from "./components/datePicker";
+import { Suspense } from "react";
+import { DashTopNav } from "./components/dash-top-nav";
+import DatePickerDashboard from "./components/date-picker";
 import { getPageHeader } from "./helpers";
 import { usePathname } from "next/navigation";
-import SideNav from "./components/sideNav";
-import { useAuthStore } from "@/app/store";
-import { useRouter } from "next/navigation";
-import { CLIENT_ROUTES } from "@/app/constants";
+import SideNav from "./components/side-nav";
 
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const token = useAuthStore((state) => state.token);
-    const router = useRouter();
+   
 
     const urlSegments = pathname.split("/").filter(Boolean);
     const currentPage = urlSegments[1] || urlSegments[0] || "dashboard";
@@ -23,15 +19,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const showRightNav = false
     const { title, description } = getPageHeader(currentPage, currentUserRole)
 
-    useEffect(() => {
-        if (!token) router.push(CLIENT_ROUTES.home);
-    }, [token, router])
+   
 
     return (
         <Suspense>
             <div className="grid grid-cols-12 h-full">
                 <div className="col-span-2">
-                    <SideNav currentPage={"Dashboard"} />
+                    <SideNav />
                 </div>
 
 
@@ -39,7 +33,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className={`${showRightNav && "grid grid-cols-12 gap-2"} bg-stone-100 col-span-10`}>
                     <div className="h-full  col-span-10">
                         <div className="hidden lg:block">
-                            <DashTopNav />
+                            <DashTopNav  currentPage={"Dashboard"} />
                         </div>
 
                         <div className="p-5">

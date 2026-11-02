@@ -29,7 +29,7 @@ export function ProfileImage({ seed = 'Alice' }: { seed?: string }) {
 
 export const DashTopNav = ({currentPage}:{currentPage:string}) => {
 
-    const currentUserRole: string = "admin"
+  
 
 
 

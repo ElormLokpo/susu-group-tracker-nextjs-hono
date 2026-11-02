@@ -1,8 +1,6 @@
 "use client"
 import { GoArrowUpRight } from "react-icons/go";
 import { TopNav } from "./components/topNav";
-import { CLIENT_ROUTES } from "./constants";
-import Link from "next/link";
 
 
 

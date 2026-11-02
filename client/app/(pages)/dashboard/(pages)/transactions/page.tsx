@@ -1,30 +1,29 @@
 "use client"
 
 import { useGetTransactions } from "@/app/hooks/transactionsHook";
-import { useState } from "react";
+
 import TransactionsTable, {
 } from "./components/transactions-table";
 
-import { type Transaction } from "./types";
 import { PiChartLineUp } from "react-icons/pi";
 import { IoWalletOutline } from "react-icons/io5";
 
 
-const initialTransactions: Transaction[] = [
-    {
-        amount: "50.00",
-        currency: "GHS",
-        groupId: "887329f2-cdcc-4585-92dc-919e16863aac",
-        groupName: "Friday Susu",
-        id: "d1de9619-0240-4b0b-8243-f5bdd99106be",
-        recordedBy: "1eefce64-eae8-47cc-9354-cff84e36e3f9",
-        recorderName: "Ama Mensah",
-        type: "contribution",
-        userId: "1eefce64-eae8-47cc-9354-cff84e36e3f9",
-        userName: "Ama Mensah",
-        week: 1,
-    },
-];
+// const initialTransactions: Transaction[] = [
+//     {
+//         amount: "50.00",
+//         currency: "GHS",
+//         groupId: "887329f2-cdcc-4585-92dc-919e16863aac",
+//         groupName: "Friday Susu",
+//         id: "d1de9619-0240-4b0b-8243-f5bdd99106be",
+//         recordedBy: "1eefce64-eae8-47cc-9354-cff84e36e3f9",
+//         recorderName: "Ama Mensah",
+//         type: "contribution",
+//         userId: "1eefce64-eae8-47cc-9354-cff84e36e3f9",
+//         userName: "Ama Mensah",
+//         week: 1,
+//     },
+// ];
 
 
 export default function TransactionsPage() {
@@ -49,7 +48,7 @@ export default function TransactionsPage() {
 
                             <TransactionsTable
                                 data={transactions}
-                                onUpdate={async (id, values) => {
+                                // onUpdate={async (id, values) => {
 
                                     // setTransactions((current) =>
                                     //     current.map((transaction) =>
@@ -58,13 +57,13 @@ export default function TransactionsPage() {
                                     //             : transaction
                                     //     )
                                     // );
-                                }}
-                                onDelete={async (id) => {
+                                // }}
+                                // onDelete={async (id) => {
 
                                     // setTransactions((current) =>
                                     //     current.filter((transaction) => transaction.id !== id)
                                     // );
-                                }}
+                                // }}
                             />
 
                         </div>

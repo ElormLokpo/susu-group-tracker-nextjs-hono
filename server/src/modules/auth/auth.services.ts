@@ -108,7 +108,7 @@ export async function deleteUser(userId: string, c: Context) {
   return softDeletedUser;
 }
 
-function buildPayload(user: User): JWTPayload {
+export function buildPayload(user: User): JWTPayload {
   return { sub: user.id, email: user.email, role: user.role as Role };
 }
 

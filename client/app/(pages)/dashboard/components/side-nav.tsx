@@ -1,12 +1,11 @@
 "use client"
 import { RxDashboard } from "react-icons/rx";
-import { CiMoneyCheck1 } from "react-icons/ci";
 import { RiGroupLine } from "react-icons/ri";
 import { LuUserRoundCheck } from "react-icons/lu";
 import { CLIENT_ROUTES } from "@/app/constants"
 import Link from "next/link";
 import { TbSettings } from "react-icons/tb";
-import { ProfileImage } from "./dashTopNav";
+import { ProfileImage } from "./dash-top-nav";
 import { HiOutlineLogout } from "react-icons/hi";
 import { useAuthStore } from "@/app/store";
 import { useRouter } from "next/navigation";
@@ -52,7 +51,7 @@ export default function SideNav() {
                     <div className=" ">
                         {
                             navLinks.map((navLink, index) => (
-                                <Link className={`flex gap-2 items-center mb-2 px-5  rounded-lg py-3 ${navLink.isActive ? "bg-stone-900 hover:bg-stone-700 text-stone-100" : "bg-white hover:bg-stone-200 text-stone-900"} text-sm `} href={navLink.href} key={index} >
+                                <Link className={`flex gap-2 items-center mb-2 px-5  rounded-lg py-3 ${navLink.isActive ? "bg-indigo-500 hover:bg-indigo-600 text-stone-100" : "bg-white hover:bg-stone-200 text-stone-900"} text-sm `} href={navLink.href} key={index} >
                                     <span>{navLink.icon}</span>
                                     <span>{navLink.name}</span>
                                 </Link>

@@ -2,14 +2,14 @@ import { createMiddleware } from "hono/factory";
 import { getCookie } from "hono/cookie";
 import { type AppVariables, Role } from "./auth.types";
 import { verifyToken } from "./auth.jwt";
-import type { AppEnv } from "../shared";
-import { ForbiddenError, UnauthorizedError } from "../../utils/errors";
 
 export const authMiddleware = createMiddleware<{ Variables: AppVariables }>(
   async (c, next) => {
     const cookieToken = getCookie(c, "auth_token");
     const headerToken = c.req.header("Authorization")?.replace("Bearer ", "");
     const token = cookieToken ?? headerToken;
+
+    console.log("auth middleware run");
 
     if (!token) {
       return c.json({ error: "Unauthorized" }, 401);
@@ -29,15 +29,20 @@ export const authMiddleware = createMiddleware<{ Variables: AppVariables }>(
   },
 );
 
-
-
-export const requireRole = (...allowed: Role[]) =>
-  createMiddleware<AppEnv>(async (c, next) => {
+export function requireRole(roles: Role[]) {
+  return createMiddleware<{ Variables: AppVariables }>(async (c, next) => {
     const user = c.get("user");
-    if (!user) throw new UnauthorizedError();
-    if (!allowed.includes(user.role)) {
-      throw new ForbiddenError(`Requires role: ${allowed.join(" or ")}`);
+
+    console.log("require role run", user, roles);
+
+    if (!user) {
+      return c.json({ error: "Unauthorized" }, 401);
     }
+
+    if (!roles.includes(user.role)) {
+      return c.json({ error: "Forbidden" }, 403);
+    }
+
     await next();
   });
-
+}

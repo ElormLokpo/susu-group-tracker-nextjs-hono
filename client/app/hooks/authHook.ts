@@ -51,7 +51,7 @@ export const useVerifyEmail = () => {
     onSuccess: (data) => {
       toast.success("Email verified successfully");
       setAuth(data.user, token as string);
-      router.push(CLIENT_ROUTES.dashboard);
+      router.push(CLIENT_ROUTES.initiateUser);
     },
     onError: () => {
       toast.error("Something went wrong. Please try again later");

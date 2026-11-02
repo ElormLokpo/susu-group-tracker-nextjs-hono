@@ -9,6 +9,7 @@ export const CLIENT_ROUTES = {
     dashboardUsers: `/dashboard/users`,
     dashboardTransactions: `/dashboard/transactions`,
     dashboardGroups: `/dashboard/groups`,
+    initiateUser: `/initiate-user`,
 }
 
 export const API_ROUTES = {
@@ -22,6 +23,8 @@ export const API_ROUTES = {
 
     getAllTransactions: `transactions/all`,
     getAllGroups: `groups`,
+    createGroup: `groups`,
+    joinGroup: `groups/members/join`,
 
 };
 

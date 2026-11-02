@@ -88,12 +88,12 @@ function toMinorUnits(amount: string): number {
     return whole * 100 + fraction;
 }
 
-function formatMinorUnits(
-    amount: number,
-    currency: string
-): string {
-    return formatMoney((amount / 100).toFixed(2), currency);
-}
+// function formatMinorUnits(
+//     amount: number,
+//     currency: string
+// ): string {
+//     return formatMoney((amount / 100).toFixed(2), currency);
+// }
 
 function initials(name: string): string {
     return name
@@ -174,7 +174,7 @@ export default function TransactionsTable({
     const columns = useMemo<ColumnDef<
         typeof transactionFeatures,
         Transaction
-        >[]>(
+    >[]>(
         () => [
             {
                 accessorKey: "userName",
@@ -434,18 +434,18 @@ export default function TransactionsTable({
         typeFilter !== "all" ||
         weekFilter !== "all";
 
-    const contributionCents = data
-        .filter(
-            (item) =>
-                item.type === "contribution" && item.currency === "GHS"
-        )
-        .reduce((total, item) => total + toMinorUnits(item.amount), 0);
+    // const contributionCents = data
+    //     .filter(
+    //         (item) =>
+    //             item.type === "contribution" && item.currency === "GHS"
+    //     )
+    //     .reduce((total, item) => total + toMinorUnits(item.amount), 0);
 
-    const payoutCents = data
-        .filter(
-            (item) => item.type === "payout" && item.currency === "GHS"
-        )
-        .reduce((total, item) => total + toMinorUnits(item.amount), 0);
+    // const payoutCents = data
+    //     .filter(
+    //         (item) => item.type === "payout" && item.currency === "GHS"
+    //     )
+    //     .reduce((total, item) => total + toMinorUnits(item.amount), 0);
 
     const rows = table.getRowModel().rows;
     const paginationState = table.state.pagination;
@@ -461,7 +461,7 @@ export default function TransactionsTable({
 
     return (
         <section className="space-y-6 text-slate-900">
-          
+
             <div className="overflow-hidden rounded-3xl  bg-white ">
                 <div className="flex flex-col gap-4 border-b border-slate-100 p-5 sm:p-6">
                     <div>
@@ -478,7 +478,7 @@ export default function TransactionsTable({
                         </p>
                     </div>
 
-                 
+
                     <div className="flex flex-col gap-3 lg:flex-row">
                         <div className="relative min-w-0 flex-1">
                             <LuSearch
@@ -548,8 +548,8 @@ export default function TransactionsTable({
                     </div>
                 </div>
 
-               
-                {error ? (
+
+                {error && (
                     <div className="flex flex-col items-center px-6 py-16 text-center">
                         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
                             <LuCircleAlert size={23} />
@@ -571,8 +571,9 @@ export default function TransactionsTable({
                             </button>
                         )}
                     </div>
-                ) : isLoading ? (
-                  
+                )}
+                {isLoading && (
+
                     <div
                         className="space-y-4 p-5"
                         aria-label="Loading transactions"
@@ -596,8 +597,9 @@ export default function TransactionsTable({
                             </div>
                         ))}
                     </div>
-                ) : rows.length === 0 ? (
-                   
+                )}
+                {rows.length === 0 ? (
+
                     <div className="flex flex-col items-center px-6 py-16 text-center">
                         <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
                             {hasFilters ? (
@@ -628,7 +630,7 @@ export default function TransactionsTable({
                     </div>
                 ) : (
                     <>
-                   
+
                         <div className="hidden overflow-x-auto md:block">
                             <table className="w-full text-left text-sm">
                                 <thead className="bg-slate-50/80 text-xs uppercase tracking-wide text-slate-500">
@@ -690,7 +692,7 @@ export default function TransactionsTable({
                             </table>
                         </div>
 
-                      
+
                         <div className="divide-y divide-slate-100 md:hidden">
                             {rows.map(({ original: item }) => (
                                 <article key={item.id} className="space-y-4 p-4">
@@ -758,7 +760,7 @@ export default function TransactionsTable({
                             ))}
                         </div>
 
-                        
+
                         <div className="flex flex-col gap-4 border-t border-slate-100 px-4 py-4 sm:px-5 md:flex-row md:items-center md:justify-between">
                             <p className="text-sm text-slate-500">
                                 Showing{" "}
@@ -818,7 +820,7 @@ export default function TransactionsTable({
                 )}
             </div>
 
-          
+
             {editing && (
                 <div className="fixed inset-0 z-50 flex justify-end">
                     <button
@@ -937,7 +939,7 @@ export default function TransactionsTable({
                                 </select>
                             </label>
 
-                       
+
 
                             {actionError && (
                                 <p role="alert" className="text-sm text-red-600">
@@ -971,7 +973,7 @@ export default function TransactionsTable({
                 </div>
             )}
 
-           
+
             {deleting && (
                 <div className="fixed inset-0 z-60 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-[2px]">
                     <div
@@ -1003,7 +1005,7 @@ export default function TransactionsTable({
                             in {deleting.groupName}, week {deleting.week}.
                         </p>
 
-                      
+
 
                         {actionError && (
                             <p role="alert" className="mt-4 text-sm text-red-600">
