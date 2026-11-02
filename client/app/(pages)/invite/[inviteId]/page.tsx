@@ -5,10 +5,13 @@ import { useJoinGroup } from "@/app/hooks/groupsHook";
 import { useAuthStore } from "@/app/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
+
+export const dynamic = 'force-dynamic';
+import { useParams } from "next/navigation";
+
 
 
 const joinGroupSchema = z
