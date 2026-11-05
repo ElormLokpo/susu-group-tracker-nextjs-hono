@@ -9,8 +9,6 @@ export const authMiddleware = createMiddleware<{ Variables: AppVariables }>(
     const headerToken = c.req.header("Authorization")?.replace("Bearer ", "");
     const token = cookieToken ?? headerToken;
 
-    
-
     if (!token) {
       return c.json({ error: "Unauthorized" }, 401);
     }
@@ -32,8 +30,6 @@ export const authMiddleware = createMiddleware<{ Variables: AppVariables }>(
 export function requireRole(roles: Role[]) {
   return createMiddleware<{ Variables: AppVariables }>(async (c, next) => {
     const user = c.get("user");
-
-  
 
     if (!user) {
       return c.json({ error: "Unauthorized" }, 401);

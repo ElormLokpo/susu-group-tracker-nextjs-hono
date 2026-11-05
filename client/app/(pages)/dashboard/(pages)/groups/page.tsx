@@ -1,8 +1,9 @@
 "use client";
 import { IoWalletOutline } from "react-icons/io5";
-import GroupsTable, { UpdateGroupInput } from "./components/groups-table";
+import GroupsTable from "./components/groups-table";
 import { PiChartLineUp } from "react-icons/pi";
 import { useGetGroups } from "@/app/hooks/groupsHook";
+
 
 export default function GroupsPage() {
     const currentUserRole: string = "admin";
@@ -16,18 +17,10 @@ export default function GroupsPage() {
 
 
 
-    const handleUpdateGroup = async (
-        id: string,
-        values: UpdateGroupInput
-    ) => {
-        void id;
-        void values;
 
-    };
 
     const handleDeleteGroup = async (id: string) => {
-
-
+        void (id)
     };
 
     return (
@@ -44,7 +37,7 @@ export default function GroupsPage() {
                                 error={error instanceof Error ? error.message : null}
                                 onRetry={() => void refetch()}
 
-                                onUpdate={handleUpdateGroup}
+
                                 onDelete={handleDeleteGroup}
                             />
                         </div>

@@ -39,3 +39,17 @@ groupsRoutes.get(
   requireRole([Role.admin, Role.member]),
   groupsController.getReport,
 );
+
+groupsRoutes.patch(
+  "/:id",
+  authMiddleware,
+  requireRole([Role.admin]),
+  groupsController.updateGroup,
+);
+
+groupsRoutes.delete(
+  "/:id",
+  authMiddleware,
+  requireRole([Role.admin]),
+  groupsController.deleteGroup,
+);
