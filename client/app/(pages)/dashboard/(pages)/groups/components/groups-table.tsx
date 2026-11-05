@@ -31,9 +31,11 @@ import {
   LuSearch,
   LuTrash2,
   LuUsers,
-  LuX,
+
 } from "react-icons/lu";
 import { IoCheckmarkCircleOutline } from "react-icons/io5";
+import { EditGroupForm } from "./edit-group-form";
+
 
 export type GroupStatus = "pending" | "active" | "completed";
 
@@ -50,6 +52,7 @@ export interface Group {
 }
 
 export interface GroupFormValues {
+  id: string;
   name: string;
   weeklyAmount: string;
   currency: string;
@@ -187,16 +190,17 @@ export default function GroupsTable({
     pageSize: 10,
   });
 
-  const [editing, setEditing] = useState<Group | null>(null);
+  const [isEditing, setIsEditing] = useState<boolean>(false)
   const [deleting, setDeleting] = useState<Group | null>(null);
   const [form, setForm] = useState<GroupFormValues>({
+    id: "",
     name: "",
     weeklyAmount: "",
     currency: "GHS",
     status: "pending",
     currentWeek: "1",
   });
-  const [saving, setSaving] = useState(false);
+
   const [deletingBusy, setDeletingBusy] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -346,7 +350,7 @@ export default function GroupsTable({
               type="button"
               aria-label={`Edit ${row.original.name}`}
               onClick={() => openEdit(row.original)}
-              disabled={!onUpdate}
+            
               className="rounded-lg p-2 text-stone-500 transition hover:bg-indigo-50 hover:text-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <LuPencil size={16} />
@@ -367,7 +371,7 @@ export default function GroupsTable({
         ),
       },
     ],
-    [onUpdate, onDelete, copied],
+    [ onDelete, copied],
   );
 
   const table = useTable({
@@ -419,8 +423,9 @@ export default function GroupsTable({
 
   function openEdit(group: Group) {
     setActionError(null);
-    setEditing(group);
+    setIsEditing(true);
     setForm({
+      id: group.id,
       name: group.name,
       weeklyAmount: group.weeklyAmount,
       currency: group.currency,
@@ -429,56 +434,7 @@ export default function GroupsTable({
     });
   }
 
-  async function saveGroup() {
-    if (!editing || !onUpdate) return;
 
-    const name = form.name.trim();
-    const amount = form.weeklyAmount.trim();
-    const currency = form.currency.trim().toUpperCase();
-    const currentWeek = Number(form.currentWeek);
-
-    if (!name) {
-      setActionError("Group name is required.");
-      return;
-    }
-    if (!/^\\d+(?:\\.\\d{1,2})?$/.test(amount) || Number(amount) <= 0) {
-      setActionError("Enter a positive amount with no more than two decimal places.");
-      return;
-    }
-    if (!/^[A-Z]{3}$/.test(currency)) {
-      setActionError("Enter a valid three-letter currency code.");
-      return;
-    }
-    if (!Number.isSafeInteger(Math.round(Number(amount) * 100))) {
-      setActionError("Amount is outside the supported range.");
-      return;
-    }
-    if (!Number.isInteger(currentWeek) || currentWeek < 1) {
-      setActionError("Current week must be a positive whole number.");
-      return;
-    }
-    if (!["pending", "active", "completed"].includes(form.status)) {
-      setActionError("Select a valid group status.");
-      return;
-    }
-
-    setSaving(true);
-    setActionError(null);
-    try {
-      await onUpdate(editing.id, {
-        name,
-        weeklyAmount: amount,
-        currency,
-        status: form.status,
-        currentWeek,
-      });
-      setEditing(null);
-    } catch {
-      setActionError("Could not update this group. Please try again.");
-    } finally {
-      setSaving(false);
-    }
-  }
 
   async function confirmDelete() {
     if (!deleting || !onDelete) return;
@@ -773,7 +729,7 @@ export default function GroupsTable({
         </div>
       </div>
 
-      {editing && (
+      {/* {editing && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <button
             type="button"
@@ -886,7 +842,7 @@ export default function GroupsTable({
               <button
                 type="button"
                 disabled={saving || !onUpdate}
-                onClick={saveGroup}
+                onClick={saveGroup}D:\code\study-projects\susu-group-tracker\client\app\(pages)\dashboard\(pages)\groups\page.tsx
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {saving && <LuLoaderCircle className="animate-spin" size={16} />}
@@ -895,7 +851,15 @@ export default function GroupsTable({
             </div>
           </aside>
         </div>
-      )}
+      )} */}
+
+      {
+        isEditing && (
+          <>
+            <EditGroupForm form={form} onUpdate={onUpdate} setIsEditing={setIsEditing} />
+          </>
+        )
+      }
 
       {deleting && (
         <div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-950/40 p-4 backdrop-blur-[2px]">

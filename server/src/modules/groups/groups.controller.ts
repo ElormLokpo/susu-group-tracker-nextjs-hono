@@ -50,3 +50,16 @@ export const getReport = async (c: C) => {
   await groupsService.assertCanView(c.get("user"), id);
   return c.json({ data: await groupsService.getReport(id) });
 };
+
+export const updateGroup = async (c: C) => {
+  const id = parseUuid(c.req.param("id"), "id");
+  const body = await parseBody(c, createGroupSchema);
+  const group = await groupsService.updateGroup(id, body);
+  return c.json({ data: group });
+};
+
+export const deleteGroup = async (c: C) => {
+  const id = parseUuid(c.req.param("id"), "id");
+  await groupsService.deleteGroup(id);
+  return c.json({ data: { message: "Group deleted successfully" } });
+};

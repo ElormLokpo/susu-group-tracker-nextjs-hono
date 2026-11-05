@@ -1,6 +1,7 @@
 "use client"
 import { GoArrowUpRight } from "react-icons/go";
 import { TopNav } from "./components/topNav";
+import Link from "next/link";
 
 
 
@@ -28,9 +29,6 @@ export default function Home() {
 
 
 const HomepageContent = () => {
-  const handleCTAClick = () => {
- 
-  }
 
   return (
     <div className="px-3 md:px-10 lg:px-20">
@@ -54,9 +52,9 @@ const HomepageContent = () => {
         </div>
 
         <div className="flex items-center justify-center mb-10 md:mb-20 lg:mb-20 2xl:mb-50">
-          <button onClick={()=>handleCTAClick()} className="hover:cursor-pointer md:text-xs lg:text-normal flex items-center animate-bounce bg-stone-900 text-stone-100 gap-3 pr-2 pl-5 shadow-xl shadow-lime-500 py-2 rounded-full">
+          <Link href="/auth" className="hover:cursor-pointer md:text-xs lg:text-normal flex items-center bg-stone-900 text-stone-100 gap-3 pr-2 pl-5 shadow-xl shadow-lime-500 py-2 rounded-full">
             Get started with SuSu<span className="bg-white text-stone-900 p-2 text-xl rounded-full"> <GoArrowUpRight /> </span>
-          </button>
+          </Link>
         </div>
 
 
@@ -200,7 +198,7 @@ const HomepageContent = () => {
                 }
               </div>
 
-              <div className="md:text-[18px] text-stone-700 lg:w-80 leading-5">$50 → $500 weekly payout, rotation savings</div>
+              <div className="md:text-[18px] text-stone-700 lg:w-80 leading-5">GHC50 → GHC500 weekly payout, rotation savings</div>
             </div>
 
           </div>

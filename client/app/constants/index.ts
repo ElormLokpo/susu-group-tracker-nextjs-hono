@@ -22,8 +22,7 @@ export const API_ROUTES = {
     googleOauth: `auth/google-oauth`,
 
     getAllTransactions: `transactions/all`,
-    getAllGroups: `groups`,
-    createGroup: `groups`,
+    groups: "groups",
     joinGroup: `groups/members/join`,
 
 };

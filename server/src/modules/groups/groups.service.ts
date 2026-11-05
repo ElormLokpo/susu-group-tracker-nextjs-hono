@@ -49,32 +49,9 @@ export const createGroup = async (
   return serializeGroup(row);
 };
 
-// export const listGroups = async (user: AuthUser) => {
-
-//     if (user.role === "admin") {
-//         const rows = await db.select().from(groups).orderBy(asc(groups.createdAt));
-//         return rows.map(serializeGroup);
-//     }
-//     const rows = await db
-//         .select({ group: groups })
-//         .from(groups)
-//         .innerJoin(groupMembers, eq(groupMembers.groupId, groups.id))
-//         .where(eq(groupMembers.userId, user.id))
-//         .orderBy(asc(groups.createdAt));
-//     return rows.map((r) => serializeGroup(r.group));
-// }
-
 export const listGroups = async () => {
   const rows = await db.select().from(groups).orderBy(asc(groups.createdAt));
   return rows.map(serializeGroup);
-
-  // const rows = await db
-  //     .select({ group: groups })
-  //     .from(groups)
-  //     .innerJoin(groupMembers, eq(groupMembers.groupId, groups.id))
-  //     .where(eq(groupMembers.userId, user.id))
-  //     .orderBy(asc(groups.createdAt));
-  // return rows.map((r) => serializeGroup(r.group));
 };
 
 export const getGroup = async (groupId: string) => {
@@ -311,4 +288,40 @@ export const getReport = async (groupId: string) => {
       paidOutAt: p.paidOutAt,
     })),
   };
+};
+
+export const updateGroup = async (
+  groupId: string,
+  input: {
+    name?: string;
+    weeklyAmount?: number;
+    currency?: string;
+    status?: "pending" | "active" | "completed";
+    currentWeek?: number;
+  },
+) => {
+  const groupExists = await db.query.groups.findFirst({
+    where: eq(groups.id, groupId),
+  });
+
+  if (!groupExists)
+    throw new NotFoundError("Group not found", "GROUP_NOT_FOUND");
+
+  const [group] = await db
+    .update(groups)
+    .set(input)
+    .where(eq(groups.id, groupId))
+    .returning();
+  return serializeGroup(group);
+};
+
+export const deleteGroup = async (groupId: string) => {
+  const groupExists = await db.query.groups.findFirst({
+    where: eq(groups.id, groupId),
+  });
+
+  if (!groupExists)
+    throw new NotFoundError("Group not found", "GROUP_NOT_FOUND");
+
+  await db.delete(groups).where(eq(groups.id, groupId));
 };
