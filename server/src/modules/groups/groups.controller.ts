@@ -2,7 +2,7 @@ import type { Context } from "hono";
 import * as groupsService from "./groups.service";
 import type { AppEnv } from "../shared";
 import { parseBody, parseUuid } from "../../utils/validate";
-import { createGroupSchema, joinGroupSchema } from "../../config";
+import { createGroupSchema, joinGroupSchema, updateGroupSchema } from "../../config";
 
 type C = Context<AppEnv>;
 
@@ -53,7 +53,7 @@ export const getReport = async (c: C) => {
 
 export const updateGroup = async (c: C) => {
   const id = parseUuid(c.req.param("id"), "id");
-  const body = await parseBody(c, createGroupSchema);
+  const body = await parseBody(c, updateGroupSchema);
   const group = await groupsService.updateGroup(id, body);
   return c.json({ data: group });
 };

@@ -296,6 +296,7 @@ export const updateGroup = async (
     name?: string;
     weeklyAmount?: number;
     currency?: string;
+    maxNumberOfMembers?: number;
     status?: "pending" | "active" | "completed";
     currentWeek?: number;
   },
@@ -306,6 +307,8 @@ export const updateGroup = async (
 
   if (!groupExists)
     throw new NotFoundError("Group not found", "GROUP_NOT_FOUND");
+
+
 
   const [group] = await db
     .update(groups)
@@ -325,3 +328,5 @@ export const deleteGroup = async (groupId: string) => {
 
   await db.delete(groups).where(eq(groups.id, groupId));
 };
+
+

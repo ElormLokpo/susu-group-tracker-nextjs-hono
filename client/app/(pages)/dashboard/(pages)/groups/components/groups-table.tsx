@@ -35,6 +35,8 @@ import {
 } from "react-icons/lu";
 import { IoCheckmarkCircleOutline } from "react-icons/io5";
 import { EditGroupForm } from "./edit-group-form";
+import { CreateGroupForm } from "./create-group-form";
+import { DeleteGroupForm } from "./delete-group-form";
 
 
 export type GroupStatus = "pending" | "active" | "completed";
@@ -45,6 +47,7 @@ export interface Group {
   weeklyAmount: string;
   currency: string;
   status: GroupStatus;
+  maxNumberOfMembers: number;
   currentWeek: number;
   inviteLink: string;
   createdBy: string;
@@ -58,10 +61,12 @@ export interface GroupFormValues {
   currency: string;
   status: GroupStatus;
   currentWeek: string;
+  maxNumberOfMembers: string;
 }
 
-export type UpdateGroupInput = Omit<GroupFormValues, "currentWeek"> & {
+export type UpdateGroupInput = Omit<GroupFormValues, "currentWeek"> & Omit<GroupFormValues, "maxNumberOfMembers"> & {
   currentWeek: number;
+  maxNumberOfMembers: number;
 };
 
 export interface GroupsTableProps {
@@ -191,18 +196,20 @@ export default function GroupsTable({
   });
 
   const [isEditing, setIsEditing] = useState<boolean>(false)
+  const [isCreating, setIsCreating] = useState<boolean>(false)
+
   const [deleting, setDeleting] = useState<Group | null>(null);
   const [form, setForm] = useState<GroupFormValues>({
     id: "",
     name: "",
     weeklyAmount: "",
+    maxNumberOfMembers: "2",
     currency: "GHS",
     status: "pending",
     currentWeek: "1",
   });
 
-  const [deletingBusy, setDeletingBusy] = useState(false);
-  const [actionError, setActionError] = useState<string | null>(null);
+
 
   const [copied, setCopied] = useState(false);
 
@@ -350,7 +357,7 @@ export default function GroupsTable({
               type="button"
               aria-label={`Edit ${row.original.name}`}
               onClick={() => openEdit(row.original)}
-            
+
               className="rounded-lg p-2 text-stone-500 transition hover:bg-indigo-50 hover:text-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <LuPencil size={16} />
@@ -359,7 +366,7 @@ export default function GroupsTable({
               type="button"
               aria-label={`Delete ${row.original.name}`}
               onClick={() => {
-                setActionError(null);
+
                 setDeleting(row.original);
               }}
               disabled={!onDelete}
@@ -371,7 +378,7 @@ export default function GroupsTable({
         ),
       },
     ],
-    [ onDelete, copied],
+    [onDelete, copied],
   );
 
   const table = useTable({
@@ -422,7 +429,7 @@ export default function GroupsTable({
   });
 
   function openEdit(group: Group) {
-    setActionError(null);
+
     setIsEditing(true);
     setForm({
       id: group.id,
@@ -431,25 +438,12 @@ export default function GroupsTable({
       currency: group.currency,
       status: group.status,
       currentWeek: String(group.currentWeek),
+      maxNumberOfMembers: String(group.maxNumberOfMembers),
     });
   }
 
 
 
-  async function confirmDelete() {
-    if (!deleting || !onDelete) return;
-
-    setDeletingBusy(true);
-    setActionError(null);
-    try {
-      await onDelete(deleting.id);
-      setDeleting(null);
-    } catch {
-      setActionError("Could not delete this group. Please try again.");
-    } finally {
-      setDeletingBusy(false);
-    }
-  }
 
   const rows = table.getRowModel().rows;
   const totalRows = table.getFilteredRowModel().rows.length;
@@ -469,16 +463,25 @@ export default function GroupsTable({
     <section className=" text-stone-900">
       <div className="rounded-t-2xl  bg-white p-4 sm:p-5">
         <div className="">
-          <div className="mb-5">
-            <div className="flex  gap-2 items-center mb-1">
-              <h2 className="text-lg font-semibold">All Savings groups</h2>
-              <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-600">
-                {data.length}
-              </span>
+          <div className="flex justify-between items-baseline">
+            <div className="mb-5">
+              <div className="flex  gap-2 items-center mb-1">
+                <h2 className="text-lg font-semibold">All Savings groups</h2>
+                <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-600">
+                  {data.length}
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-stone-500">
+                Manage and track your susu groups.
+              </p>
             </div>
-            <p className="mt-1 text-sm text-stone-500">
-              Manage and track your susu groups.
-            </p>
+
+            <div>
+              <button className="text-xs bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 transition" onClick={() => setIsCreating(true)}>
+                Create New Group
+              </button>
+            </div>
+
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -729,129 +732,7 @@ export default function GroupsTable({
         </div>
       </div>
 
-      {/* {editing && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          <button
-            type="button"
-            aria-label="Close edit panel"
-            onClick={() => !saving && setEditing(null)}
-            className="absolute inset-0 bg-stone-950/40 backdrop-blur-[2px]"
-          />
-          <aside
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="edit-group-title"
-            className="relative flex h-full w-full max-w-lg flex-col bg-white shadow-2xl"
-          >
-            <div className="flex items-start justify-between border-b border-stone-100 p-6">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-indigo-600">
-                  Group details
-                </p>
-                <h2 id="edit-group-title" className="mt-1 text-xl font-semibold">
-                  Edit savings group
-                </h2>
-                <p className="mt-1 text-sm text-stone-500">
-                  Update the group settings below.
-                </p>
-              </div>
-              <button
-                type="button"
-                aria-label="Close"
-                disabled={saving}
-                onClick={() => setEditing(null)}
-                className="rounded-xl p-2 text-stone-500 hover:bg-stone-100"
-              >
-                <LuX size={20} />
-              </button>
-            </div>
 
-            <div className="flex-1 space-y-5 overflow-y-auto p-6">
-
-
-              <label className="block space-y-2">
-                <span className="text-sm font-medium">Group name</span>
-                <input
-                  value={form.name}
-                  onChange={(event) => setForm({ ...form, name: event.target.value })}
-                  className={inputClass.replace("pl-10", "pl-3")}
-                  placeholder="e.g. Family Susu"
-                />
-              </label>
-
-              <label className="block space-y-2">
-                <span className="text-sm font-medium">Weekly contribution</span>
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={form.weeklyAmount}
-                  onChange={(event) => setForm({ ...form, weeklyAmount: event.target.value })}
-                  className={inputClass.replace("pl-10", "pl-3")}
-                  placeholder="50.00"
-                />
-              </label>
-
-              <div className="grid grid-cols-2 gap-4">
-                <label className="block space-y-2">
-                  <span className="text-sm font-medium">Currency</span>
-                  <input
-                    value={form.currency}
-                    maxLength={3}
-                    onChange={(event) => setForm({ ...form, currency: event.target.value.toUpperCase() })}
-                    className={inputClass.replace("pl-10", "pl-3")}
-                  />
-                </label>
-                <label className="block space-y-2">
-                  <span className="text-sm font-medium">Current week</span>
-                  <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    value={form.currentWeek}
-                    onChange={(event) => setForm({ ...form, currentWeek: event.target.value })}
-                    className={inputClass.replace("pl-10", "pl-3")}
-                  />
-                </label>
-              </div>
-
-              <label className="block space-y-2">
-                <span className="text-sm font-medium">Status</span>
-                <select
-                  value={form.status}
-                  onChange={(event) => setForm({ ...form, status: event.target.value as GroupStatus })}
-                  className="w-full rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm text-stone-900 outline-none transition focus:border-indigo-500"
-                >
-                  <option value="pending">Pending</option>
-                  <option value="active">Active</option>
-                  <option value="completed">Completed</option>
-                </select>
-              </label>
-
-              {actionError && <p role="alert" className="text-sm text-red-600">{actionError}</p>}
-            </div>
-
-            <div className="flex gap-3 border-t border-stone-100 p-6">
-              <button
-                type="button"
-                disabled={saving}
-                onClick={() => setEditing(null)}
-                className="flex-1 rounded-xl border border-stone-200 px-4 py-3 text-sm font-medium hover:bg-stone-50 disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                disabled={saving || !onUpdate}
-                onClick={saveGroup}D:\code\study-projects\susu-group-tracker\client\app\(pages)\dashboard\(pages)\groups\page.tsx
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {saving && <LuLoaderCircle className="animate-spin" size={16} />}
-                {saving ? "Saving..." : "Save changes"}
-              </button>
-            </div>
-          </aside>
-        </div>
-      )} */}
 
       {
         isEditing && (
@@ -861,47 +742,18 @@ export default function GroupsTable({
         )
       }
 
+      {
+        isCreating && (
+          <>
+            <CreateGroupForm setIsCreating={setIsCreating} />
+          </>
+        )
+      }
+
+
+
       {deleting && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-950/40 p-4 backdrop-blur-[2px]">
-          <div
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="delete-group-title"
-            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
-          >
-            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-600">
-              <LuTrash2 size={22} />
-            </div>
-            <h2 id="delete-group-title" className="text-lg font-semibold">
-              Delete this savings group?
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-stone-500">
-              Are you sure you want to delete{" "}
-              <span className="font-medium text-stone-800">{deleting.name}</span>?
-              This action cannot be undone.
-            </p>
-            {actionError && <p role="alert" className="mt-4 text-sm text-red-600">{actionError}</p>}
-            <div className="mt-6 flex gap-3">
-              <button
-                type="button"
-                disabled={deletingBusy}
-                onClick={() => setDeleting(null)}
-                className="flex-1 rounded-xl border border-stone-200 px-4 py-3 text-sm font-medium hover:bg-stone-50 disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                disabled={deletingBusy || !onDelete}
-                onClick={confirmDelete}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {deletingBusy && <LuLoaderCircle className="animate-spin" size={16} />}
-                {deletingBusy ? "Deleting..." : "Delete group"}
-              </button>
-            </div>
-          </div>
-        </div>
+        <DeleteGroupForm setDeleting={setDeleting} deleting={deleting} />
       )}
     </section>
   );

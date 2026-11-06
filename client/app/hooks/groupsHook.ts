@@ -75,10 +75,11 @@ export const useEditGroup = (groupId: string) => {
     return useMutation({
         mutationFn: async (data: {
             name: string;
-            weeklyContribution: string;
+            weeklyAmount: number;
             currency: string;
             status: "pending" | "active" | "completed";
-            currentWeek: string;
+            currentWeek: number;
+            maxNumberOfMembers: number;
         }) => await api.patch(`${API_ROUTES.groups}/${groupId}`, data, {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -90,6 +91,10 @@ export const useEditGroup = (groupId: string) => {
             toast.success("Group updated successfully");
             return data;
         },
+        onError: () => {
+            const errorMessage = "An error occurred while updating the group";
+            toast.error(errorMessage);
+        }
     });
 }
 
@@ -113,4 +118,21 @@ export const useGetGroupReport = (groupId: string) => {
         enabled: true,
     });
 
+}
+
+export const useDeleteGroup = () => {
+    const queryClient = useQueryClient();
+    const token = useAuthStore.getState().token;
+
+    return useMutation({
+        mutationFn: async (groupId: string) => api.delete(`${API_ROUTES.groups}/${groupId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["groups"] });
+            toast.success("Group deleted successfully");
+        }
+    });
 }

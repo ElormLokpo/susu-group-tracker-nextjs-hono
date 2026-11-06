@@ -13,15 +13,15 @@ import { useCreateGroup } from "@/app/hooks/groupsHook";
 const createGroupSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters"),
     weeklyAmount: z
-        .string()
+       .string()
         .refine(
             (value) => value.trim() !== "" && !isNaN(Number(value)),
             "Weekly amount must be a valid number"
         )
         .refine(
-            (value) => Number(value) >= 50,
+            (value) => Number(value) <= 50,
             "Weekly amount must be at least 50 GHS"
-        ),
+        ), 
 
     maxNumberOfMembers: z
         .string()
