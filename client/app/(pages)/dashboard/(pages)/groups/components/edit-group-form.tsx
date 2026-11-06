@@ -18,6 +18,7 @@ export interface GroupFormValues {
     currency: string;
     status: GroupStatus;
     currentWeek: string;
+    maxNumberOfMembers: string;
 }
 
 export interface Group {
@@ -27,6 +28,7 @@ export interface Group {
     currency: string;
     status: GroupStatus;
     currentWeek: number;
+    maximumNumberOfMembers: number;
     inviteLink: string;
     createdBy: string;
     createdAt: string;
@@ -38,7 +40,7 @@ export interface Group {
 
 const editGroupSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters"),
-    weeklyContribution: z
+    weeklyAmount: z
         .string()
         .refine(
             (value) => value.trim() !== "" && !isNaN(Number(value)),
@@ -48,7 +50,11 @@ const editGroupSchema = z.object({
             (value) => Number(value) >= 50,
             "Weekly amount must be at least 50 GHS"
         ),
-
+    maxNumberOfMembers: z.string()
+        .refine(
+            (value) => value.trim() !== "" && !isNaN(Number(value)),
+            "Maximum number of members must be a valid number"
+        ),
     currency: z.string(),
     status: z.enum(["pending", "active", "completed"]),
     currentWeek: z
@@ -63,20 +69,21 @@ const editGroupSchema = z.object({
 type EditGroupType = z.infer<typeof editGroupSchema>;
 
 
-export const EditGroupForm = ({ setIsEditing,  form }: { setIsEditing: Dispatch<SetStateAction<boolean>>, onUpdate?: (id: string, values: UpdateGroupInput) => Promise<void>; form: GroupFormValues }) => {
+export const EditGroupForm = ({ setIsEditing, form }: { setIsEditing: Dispatch<SetStateAction<boolean>>, onUpdate?: (id: string, values: UpdateGroupInput) => Promise<void>; form: GroupFormValues }) => {
     const [statusForm, setStatusForm] = useState<GroupStatus>(form.status);
-    const { register, handleSubmit, formState: { errors } } = useForm<EditGroupType>({
+    const { register, handleSubmit, formState: { errors }, setError } = useForm<EditGroupType>({
         resolver: zodResolver(editGroupSchema),
         defaultValues: {
             name: form.name,
-            weeklyContribution: form.weeklyAmount,
+            weeklyAmount: form.weeklyAmount,
             currency: form.currency,
             status: form.status,
             currentWeek: form.currentWeek,
+            maxNumberOfMembers: form.maxNumberOfMembers,
         }
     })
 
-    const { mutate: editGroup, isPending, isSuccess } = useEditGroup(form.id);
+    const { mutate: editGroup, isPending, isSuccess, isError } = useEditGroup(form.id);
 
 
     const onSubmit = async (data: EditGroupType) => {
@@ -85,6 +92,9 @@ export const EditGroupForm = ({ setIsEditing,  form }: { setIsEditing: Dispatch<
 
         const finalData = {
             ...formData,
+            maxNumberOfMembers: parseInt(formData.maxNumberOfMembers),
+            currentWeek: parseInt(formData.currentWeek),
+            weeklyAmount: parseFloat(formData.weeklyAmount),
             status: statusForm,
         }
 
@@ -99,6 +109,42 @@ export const EditGroupForm = ({ setIsEditing,  form }: { setIsEditing: Dispatch<
 
 
     }, [isSuccess, setIsEditing]);
+
+    useEffect(() => {
+        if (isError) {
+
+            setError("name", {
+                type: "manual",
+                message: " ",
+            });
+
+            setError("maxNumberOfMembers", {
+                type: "manual",
+                message: " ",
+            });
+
+            setError("currentWeek", {
+                type: "manual",
+                message: " ",
+            });
+
+            setError("weeklyAmount", {
+                type: "manual",
+                message: " ",
+            });
+
+            setError("currency", {
+                type: "manual",
+                message: " ",
+            });
+
+            setError("status", {
+                type: "manual",
+                message: "Error updating group. Please try again.",
+            });
+        }
+    }, [isError, setError]);
+
 
     return (
         <div className="fixed inset-0 z-50 flex justify-end">
@@ -150,18 +196,18 @@ export const EditGroupForm = ({ setIsEditing,  form }: { setIsEditing: Dispatch<
                             />
                         </label>
 
-                        <label className="block space-y-2">
-                            <Input<EditGroupType>
-                                register={register}
-                                errors={errors}
-                                name="weeklyContribution"
-                                label="Weekly contribution:"
-                                inputMode="decimal"
-                                placeholder="50.00"
-                            />
-                        </label>
-
                         <div className="grid grid-cols-2 gap-4">
+                            <label className="block space-y-2">
+                                <Input<EditGroupType>
+                                    register={register}
+                                    errors={errors}
+                                    name="weeklyAmount"
+                                    label="Weekly Amount:"
+                                    inputMode="decimal"
+                                    placeholder="50.00"
+                                />
+                            </label>
+
                             <label className="block space-y-2">
                                 <Input<EditGroupType>
                                     register={register}
@@ -170,6 +216,21 @@ export const EditGroupForm = ({ setIsEditing,  form }: { setIsEditing: Dispatch<
                                     label="Currency:"
                                     placeholder="e.g. USD"
                                     maxLength={3}
+                                />
+                            </label>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <label className="block space-y-2">
+                                <Input<EditGroupType>
+                                    register={register}
+                                    errors={errors}
+                                    name="maxNumberOfMembers"
+                                    label="Maximum number of members:"
+                                    type="number"
+                                    min="2"
+                                    max="5"
+                                    step="1"
                                 />
                             </label>
                             <label className="block space-y-2">
@@ -215,7 +276,7 @@ export const EditGroupForm = ({ setIsEditing,  form }: { setIsEditing: Dispatch<
                         </button>
                         <button
                             type="submit"
-                            disabled={isPending }
+                            disabled={isPending}
 
                             className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
                         >

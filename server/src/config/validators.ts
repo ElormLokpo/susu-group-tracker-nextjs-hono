@@ -66,15 +66,13 @@ export const createGroupSchema = z.object({
 
 export const updateGroupSchema = z.object({
   name: z.string().trim().min(2).max(100),
-  weeklyContribution: z.number().min(50),
+  weeklyAmount: z.number().min(50),
   currency: z.string(),
+  maxNumberOfMembers: z.number().min(2).max(100)
+  ,
   status: z.enum(["pending", "active", "completed"]),
-  currentWeek: z
-    .string()
-    .refine(
-      (value) => value.trim() !== "" && !isNaN(Number(value)),
-      "Current week must be a valid number",
-    ),
+  currentWeek: z.number().min(1).max(4),
+
 });
 
 export const joinGroupSchema = z.object({
